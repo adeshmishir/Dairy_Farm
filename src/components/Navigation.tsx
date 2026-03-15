@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Milk } from 'lucide-react';
+
 
 export default function Navigation() {
   const location = useLocation();
@@ -11,12 +11,12 @@ export default function Navigation() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
           <Link to="/" className="flex items-center space-x-3 group">
-            <div className="bg-green-600 p-2 rounded-lg group-hover:bg-green-700 transition-colors">
-              <Milk className="h-8 w-8 text-white" />
+            <div className="bg-white rounded-full p-1 overflow-hidden h-14 w-14 flex items-center justify-center border-2 border-green-100 group-hover:border-green-300 transition-colors">
+              <img src="/logo.png" alt="Mishra Dairy Farm Logo" className="h-full w-full object-contain" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Mishra Dairy Farm</h1>
-              <p className="text-xs text-green-600">Pure. Safe. Tested.</p>
+              <h1 className="text-2xl font-bold text-gray-900 group-hover:text-green-700 transition-colors">Mishra Dairy Farm</h1>
+              <p className="text-xs font-semibold text-green-600 tracking-wider uppercase">Pure. Fresh. Always.</p>
             </div>
           </Link>
 
@@ -60,6 +60,16 @@ export default function Navigation() {
               }`}
             >
               About Us
+            </Link>
+            <Link
+              to="/gallery"
+              className={`px-6 py-2 rounded-lg font-medium transition-all ${
+                isActive('/gallery')
+                  ? 'bg-green-600 text-white'
+                  : 'text-gray-700 hover:bg-green-50 hover:text-green-600'
+              }`}
+            >
+              Gallery
             </Link>
           </div>
         </div>

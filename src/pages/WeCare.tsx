@@ -1,4 +1,4 @@
-import { Recycle, Users, Sprout, Calendar, MapPin, Clock } from 'lucide-react';
+import { Calendar, MapPin, Clock, Users } from 'lucide-react';
 
 export default function WeCare() {
   return (
@@ -14,9 +14,9 @@ export default function WeCare() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         <div className="grid md:grid-cols-3 gap-10 mb-24">
-          <div className="bg-gradient-to-br from-green-50 to-blue-50 rounded-3xl p-10 hover:shadow-2xl transition-all duration-300 border border-green-100">
-            <div className="bg-white w-20 h-20 rounded-2xl flex items-center justify-center mb-6 shadow-md">
-              <Recycle className="h-10 w-10 text-green-600" />
+          <div className="bg-gradient-to-br from-green-50 to-blue-50 rounded-3xl p-10 hover:shadow-2xl transition-all duration-300 border border-green-100 flex flex-col items-center text-center">
+            <div className="w-56 h-56 mb-8 overflow-hidden flex items-center justify-center mix-blend-multiply">
+              <img src="/images/wecare/recycle.png" alt="Closing the Plastic Loop" className="max-w-full max-h-full object-contain" />
             </div>
             <h2 className="text-3xl font-bold text-gray-900 mb-4">
               Closing the Plastic Loop
@@ -26,9 +26,9 @@ export default function WeCare() {
             </p>
           </div>
 
-          <div className="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-3xl p-10 hover:shadow-2xl transition-all duration-300 border border-orange-100">
-            <div className="bg-white w-20 h-20 rounded-2xl flex items-center justify-center mb-6 shadow-md">
-              <Users className="h-10 w-10 text-orange-600" />
+          <div className="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-3xl p-10 hover:shadow-2xl transition-all duration-300 border border-orange-100 flex flex-col items-center text-center">
+            <div className="w-56 h-56 mb-8 overflow-hidden flex items-center justify-center mix-blend-multiply">
+              <img src="/images/wecare/farmer.png" alt="Putting Farmers First" className="max-w-full max-h-full object-contain" />
             </div>
             <h2 className="text-3xl font-bold text-gray-900 mb-4">
               Putting Farmers First
@@ -38,9 +38,9 @@ export default function WeCare() {
             </p>
           </div>
 
-          <div className="bg-gradient-to-br from-emerald-50 to-green-50 rounded-3xl p-10 hover:shadow-2xl transition-all duration-300 border border-emerald-100">
-            <div className="bg-white w-20 h-20 rounded-2xl flex items-center justify-center mb-6 shadow-md">
-              <Sprout className="h-10 w-10 text-emerald-600" />
+          <div className="bg-gradient-to-br from-emerald-50 to-green-50 rounded-3xl p-10 hover:shadow-2xl transition-all duration-300 border border-emerald-100 flex flex-col items-center text-center">
+            <div className="w-56 h-56 mb-8 overflow-hidden flex items-center justify-center mix-blend-multiply">
+              <img src="/images/wecare/ecosystem.png" alt="Building a Better Milk Ecosystem" className="max-w-full max-h-full object-contain" />
             </div>
             <h2 className="text-3xl font-bold text-gray-900 mb-4">
               Building a Better Milk Ecosystem
