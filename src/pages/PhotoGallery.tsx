@@ -2,34 +2,39 @@ import { Camera } from 'lucide-react';
 
 const galleryImages = [
   {
-    url: "https://images.pexels.com/photos/10141619/pexels-photo-10141619.jpeg?auto=compress&cs=tinysrgb&w=800",
-    title: "Healthy Herd",
-    category: "Cows"
+    url: "https://res.cloudinary.com/dfect5qyk/image/upload/v1773684236/mishra_dairy_farm/gallery-1.png",
+    title: "Nourishing Our Calves",
+    category: "Care"
   },
   {
-    url: "https://images.pexels.com/photos/11124976/pexels-photo-11124976.jpeg?auto=compress&cs=tinysrgb&w=800",
-    title: "Morning Grazing",
-    category: "Buffaloes"
+    url: "https://res.cloudinary.com/dfect5qyk/image/upload/v1773684238/mishra_dairy_farm/gallery-2.jpg",
+    title: "Gentle Hands, Trusting Calves",
+    category: "Bonding"
   },
   {
-    url: "https://images.pexels.com/photos/422218/pexels-photo-422218.jpeg?auto=compress&cs=tinysrgb&w=800",
-    title: "Our Green Pastures",
-    category: "Farm"
+    url: "https://res.cloudinary.com/dfect5qyk/image/upload/v1773684239/mishra_dairy_farm/gallery-3.jpg",
+    title: "Healthy & Happy Herd",
+    category: "Farm Life"
   },
   {
-    url: "https://images.pexels.com/photos/1692693/pexels-photo-1692693.jpeg?auto=compress&cs=tinysrgb&w=800",
-    title: "Fresh Milk Daily",
-    category: "Milk"
+    url: "https://res.cloudinary.com/dfect5qyk/image/upload/v1773684240/mishra_dairy_farm/gallery-4.png",
+    title: "Pure, Fresh Milking",
+    category: "Fresh Milk"
   },
   {
-    url: "https://images.pexels.com/photos/20853588/pexels-photo-20853588.jpeg?auto=compress&cs=tinysrgb&w=800",
-    title: "Happy Cows",
-    category: "Cows"
+    url: "https://res.cloudinary.com/dfect5qyk/image/upload/v1773684241/mishra_dairy_farm/gallery-5.jpg",
+    title: "Innocence & Bonding",
+    category: "Bonding"
   },
   {
-    url: "https://images.unsplash.com/photo-1596704017254-9b121068fb31?auto=compress&cs=tinysrgb&w=800",
-    title: "Calm Surroundings",
-    category: "Buffaloes"
+    url: "https://res.cloudinary.com/dfect5qyk/image/upload/v1773684243/mishra_dairy_farm/gallery-6.jpg",
+    title: "Irrigation & Greenery",
+    category: "Nature"
+  },
+  {
+    url: "https://res.cloudinary.com/dfect5qyk/image/upload/v1773684244/mishra_dairy_farm/gallery-7.jpg",
+    title: "Our Dedicated Team",
+    category: "Farm Life"
   }
 ];
 

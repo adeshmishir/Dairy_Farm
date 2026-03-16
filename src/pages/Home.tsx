@@ -1,5 +1,60 @@
-import { useState } from 'react';
-import { Shield, Droplet, Sparkles, ClipboardCheck, Award, Heart, Star, Milk, Leaf, Handshake } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Shield, Droplet, Sparkles, ClipboardCheck, Award, Heart, Star, Milk, Leaf, Handshake, ArrowRight } from 'lucide-react';
+
+const AnimatedCounter = ({ end, suffix = "", duration = 2000 }: { end: number, suffix?: string, duration?: number }) => {
+  const [count, setCount] = useState(0);
+  const countRef = useRef(null);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setIsVisible(true);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (countRef.current) {
+      observer.observe(countRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!isVisible) return;
+
+    let startTime: number;
+    let animationFrame: number;
+
+    const animate = (timestamp: number) => {
+      if (!startTime) startTime = timestamp;
+      const progress = timestamp - startTime;
+      
+      const percentage = Math.min(progress / duration, 1);
+      // Easing function (easeOutExpo)
+      const easePercentage = percentage === 1 ? 1 : 1 - Math.pow(2, -10 * percentage);
+      
+      setCount(Math.floor(end * easePercentage));
+
+      if (progress < duration) {
+        animationFrame = requestAnimationFrame(animate);
+      }
+    };
+
+    animationFrame = requestAnimationFrame(animate);
+
+    return () => cancelAnimationFrame(animationFrame);
+  }, [end, duration, isVisible]);
+
+  return (
+    <span ref={countRef}>
+      {count}{suffix}
+    </span>
+  );
+};
 
 export default function Home() {
   const [reviews, setReviews] = useState([
@@ -29,23 +84,63 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="text-center mb-20">
-          <div className="inline-block mb-6">
-            <span className="bg-green-100 text-green-800 px-6 py-2 rounded-full text-sm font-semibold tracking-wide uppercase">
-              Tested fresh every morning!
-            </span>
-          </div>
-          <h1 className="text-6xl font-bold text-gray-900 mb-6 leading-tight">
-            Fresh milk from our farm
-            <br />
-            <span className="text-green-600">to your home</span>
-          </h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-12 leading-relaxed">
-            Healthy cattle produce better milk. That's why we provide high-nutrition animal feed for our cows, and pure, safe milk for your family.
-          </p>
+    <div className="min-h-screen bg-gray-50">
+      {/* Hero Section */}
+      <div className="relative bg-white overflow-hidden">
+        <div className="absolute inset-0">
+          <img
+            src="https://images.pexels.com/photos/422218/pexels-photo-422218.jpeg?auto=compress&cs=tinysrgb&w=1600"
+            alt="Farm background"
+            className="w-full h-full object-cover opacity-10"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-white via-white/90 to-transparent"></div>
         </div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative pt-20 pb-24 lg:pt-32 lg:pb-32">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div className="text-center lg:text-left z-10">
+              <div className="inline-flex items-center mb-6 bg-green-50 text-green-700 px-4 py-2 rounded-full font-semibold border border-green-200 shadow-sm animate-fade-in-up">
+                <Sparkles className="w-5 h-5 mr-2 text-green-500" />
+                <span>Tested fresh every morning!</span>
+              </div>
+              <h1 className="text-5xl lg:text-7xl font-extrabold text-gray-900 mb-6 leading-tight tracking-tight">
+                Fresh milk from <br className="hidden lg:block"/>our farm
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-green-400 block mt-2">to your home.</span>
+              </h1>
+              <p className="text-xl text-gray-600 mb-10 leading-relaxed max-w-2xl mx-auto lg:mx-0 font-light">
+                Healthy cattle produce better milk. That's why we provide high-nutrition animal feed for our cows, and pure, safe milk for your family.
+              </p>
+              <div className="flex flex-col sm:flex-row justify-center lg:justify-start gap-4">
+                <a href="/products" className="bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-8 rounded-full shadow-lg hover:shadow-xl transition-all flex items-center justify-center">
+                  Explore Products
+                  <ArrowRight className="ml-2 w-5 h-5" />
+                </a>
+              </div>
+            </div>
+            
+            <div className="relative hidden lg:block z-10">
+              <div className="absolute inset-0 bg-gradient-to-tr from-green-400 to-green-600 rounded-[3rem] transform rotate-3 scale-105 opacity-20 blur-xl"></div>
+              <img 
+                src="https://images.pexels.com/photos/821365/pexels-photo-821365.jpeg?auto=compress&cs=tinysrgb&w=800"
+                alt="Fresh Milk Pouring"
+                className="relative rounded-[3rem] shadow-2xl object-cover w-full h-[500px] border-4 border-white"
+              />
+              {/* Floating Badge */}
+              <div className="absolute -bottom-6 -left-6 bg-white p-6 rounded-3xl shadow-xl flex items-center space-x-4 border border-gray-100">
+                <div className="bg-green-100 p-3 rounded-2xl">
+                  <Shield className="w-8 h-8 text-green-600" />
+                </div>
+                <div>
+                  <p className="font-bold text-gray-900 text-lg">100% Pure</p>
+                  <p className="text-gray-500 text-sm">Farm to Table</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 -mt-10 relative z-20">
 
         <div className="grid md:grid-cols-3 gap-8 mb-16">
           <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 border-2 border-green-100 hover:border-green-300 text-center md:text-left">
@@ -86,29 +181,37 @@ export default function Home() {
               <div className="bg-green-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 border border-green-200">
                 <Heart className="h-8 w-8 text-green-600" />
               </div>
-              <h4 className="text-4xl font-extrabold text-gray-900 mb-2">50+</h4>
-              <p className="text-green-700 font-semibold tracking-wide">Healthy Cattle</p>
+              <h4 className="text-4xl lg:text-5xl font-extrabold text-gray-900 mb-2">
+                <AnimatedCounter end={50} suffix="+" />
+              </h4>
+              <p className="text-green-700 font-semibold tracking-wide uppercase text-sm">Healthy Cattle</p>
             </div>
             <div className="text-center md:px-4">
-              <div className="bg-green-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 border border-green-200">
-                <Milk className="h-8 w-8 text-green-600" />
+              <div className="bg-white w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-md transform -rotate-3 hover:rotate-0 transition-transform">
+                <Milk className="h-10 w-10 text-green-600" />
               </div>
-              <h4 className="text-4xl font-extrabold text-gray-900 mb-2">200+</h4>
-              <p className="text-green-700 font-semibold tracking-wide">Litres Milk Daily</p>
+              <h4 className="text-4xl lg:text-5xl font-extrabold text-gray-900 mb-2">
+                <AnimatedCounter end={200} suffix="+" />
+              </h4>
+              <p className="text-green-700 font-semibold tracking-wide uppercase text-sm">Litres Daily</p>
             </div>
             <div className="text-center md:px-4">
-              <div className="bg-green-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 border border-green-200">
-                <Leaf className="h-8 w-8 text-green-600" />
+              <div className="bg-white w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-md transform rotate-3 hover:rotate-0 transition-transform">
+                <Leaf className="h-10 w-10 text-green-600" />
               </div>
-              <h4 className="text-4xl font-extrabold text-gray-900 mb-2">10+</h4>
-              <p className="text-green-700 font-semibold tracking-wide">Feed Products</p>
+              <h4 className="text-4xl lg:text-5xl font-extrabold text-gray-900 mb-2">
+                <AnimatedCounter end={10} suffix="+" />
+              </h4>
+              <p className="text-green-700 font-semibold tracking-wide uppercase text-sm">Feed Products</p>
             </div>
             <div className="text-center md:px-4">
-              <div className="bg-green-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 border border-green-200">
-                <Handshake className="h-8 w-8 text-green-600" />
+              <div className="bg-white w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-md transform -rotate-3 hover:rotate-0 transition-transform">
+                <Handshake className="h-10 w-10 text-green-600" />
               </div>
-              <h4 className="text-4xl font-extrabold text-gray-900 mb-2">100+</h4>
-              <p className="text-green-700 font-semibold tracking-wide">Happy Farmers</p>
+              <h4 className="text-4xl lg:text-5xl font-extrabold text-gray-900 mb-2">
+                <AnimatedCounter end={100} suffix="+" />
+              </h4>
+              <p className="text-green-700 font-semibold tracking-wide uppercase text-sm">Happy Farmers</p>
             </div>
           </div>
         </div>

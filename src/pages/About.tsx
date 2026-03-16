@@ -136,20 +136,29 @@ export default function About() {
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-green-600 to-green-700 rounded-3xl p-10 shadow-xl text-white">
-            <h3 className="text-3xl font-bold mb-6">Meet Our Owner</h3>
-            <div className="space-y-6">
-              <div>
-                <h4 className="text-xl font-semibold mb-2 opacity-90">Suneel Mishra</h4>
-                <p className="text-lg opacity-80">Founder & Owner</p>
+          <div className="bg-gradient-to-br from-green-600 to-green-700 rounded-3xl p-10 shadow-xl text-white overflow-hidden">
+            <h3 className="text-3xl font-bold mb-6 text-center md:text-left">Meet Our Owner</h3>
+            <div className="flex flex-col md:flex-row gap-8 items-center md:items-start">
+              <div className="w-48 h-48 flex-shrink-0">
+                <img 
+                  src="https://res.cloudinary.com/dfect5qyk/image/upload/v1773684235/mishra_dairy_farm/founder.png" 
+                  alt="Suneel Mishra - Founder" 
+                  className="w-full h-full object-cover rounded-2xl shadow-lg border-4 border-green-500/30"
+                />
               </div>
-              <div className="h-px bg-white opacity-20"></div>
-              <p className="text-lg leading-relaxed opacity-90">
-                With a vision to transform the dairy industry and a passion for sustainable farming, Suneel Mishra established Mishra Dairy Farm to bring safe, pure milk to every household.
-              </p>
-              <p className="text-lg leading-relaxed opacity-90">
-                His commitment to quality, transparency, and animal welfare has made our farm a trusted name in the community.
-              </p>
+              <div className="space-y-4 flex-1 text-center md:text-left">
+                <div>
+                  <h4 className="text-xl font-semibold mb-1 opacity-95">Suneel Mishra</h4>
+                  <p className="text-lg opacity-80 font-medium">Founder & Owner</p>
+                </div>
+                <div className="h-px bg-white/20 w-full"></div>
+                <p className="text-lg leading-relaxed opacity-90">
+                  With a vision to transform the dairy industry and a passion for sustainable farming, Suneel Mishra established Mishra Dairy Farm to bring safe, pure milk to every household.
+                </p>
+                <p className="text-lg leading-relaxed opacity-90">
+                  His commitment to quality, transparency, and animal welfare has made our farm a trusted name in the community.
+                </p>
+              </div>
             </div>
           </div>
         </div>
