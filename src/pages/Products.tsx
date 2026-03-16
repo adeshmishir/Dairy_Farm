@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Milk, Droplets, Leaf, Zap, Check, ChevronRight, X } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 
 const milkProducts = [
   {
@@ -110,38 +112,6 @@ const feedProducts = [
       whyFeedTitle: "Why Feed Finisher?",
       whyFeed: "Feeding finisher feed is essential for preparing cattle for market. This special feed is high in energy to promote rapid weight gain and muscle growth. It provides the right nutrients to enhance meat quality and ensures cattle reach their optimal size and condition efficiently, resulting in better market readiness and profitability."
     }
-  },
-  {
-    name: "Cattle Feed",
-    description: "High-yield balanced formula for lactating cows and buffaloes.",
-    benefits: "Increases milk production and maintains cattle health.",
-    nutrition: "Rich in proteins, calcium, and essential vitamins.",
-    price: "₹1200 / 50kg bag",
-    image: "https://images.unsplash.com/photo-1605333396914-239618b76df4?auto=compress&cs=tinysrgb&w=800"
-  },
-  {
-    name: "Mineral Mixture",
-    description: "Essential mineral powder supplement for livestock.",
-    benefits: "Improves fertility, immunity, and overall growth.",
-    nutrition: "Fortified with Calcium, Phosphorus, Zinc, and Copper.",
-    price: "₹180 / 1kg pack",
-    image: "https://images.pexels.com/photos/3945657/pexels-photo-3945657.jpeg?auto=compress&cs=tinysrgb&w=800"
-  },
-  {
-    name: "Chuni / Chokar",
-    description: "Premium quality wheat bran / pulse husks.",
-    benefits: "Highly digestible energy source, perfect for daily feeding.",
-    nutrition: "High fiber content and easily digestible carbohydrates.",
-    price: "₹950 / 40kg bag",
-    image: "https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=compress&cs=tinysrgb&w=800"
-  },
-  {
-    name: "Khal (Oil Cake)",
-    description: "Pure mustard or cottonseed oil cake residue.",
-    benefits: "Exceptional for boosting milk fat percentage and richness.",
-    nutrition: "Very high bypass protein and essential fats.",
-    price: "₹1850 / 50kg bag",
-    image: "https://images.unsplash.com/photo-1523348837708-15d4a09af1e0?auto=compress&cs=tinysrgb&w=800"
   }
 ];
 
@@ -214,11 +184,11 @@ export default function Products() {
         </div>
 
         {/* Product Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {(activeTab === 'milk' ? milkProducts : feedProducts).map((product: any, index) => (
-            <div
+            <Card
               key={index}
-              className="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 group border border-gray-100 flex flex-col"
+              className="overflow-hidden hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 group border border-gray-100 flex flex-col"
             >
               <div className="relative h-64 overflow-hidden">
                 <img
@@ -230,24 +200,24 @@ export default function Products() {
                   {activeTab === 'milk' ? 'Farm Fresh' : 'Premium Quality'}
                 </div>
               </div>
-              <div className="p-8 flex flex-col flex-1">
+              <CardContent className="flex flex-col flex-1 pt-8">
                 <div className="flex justify-between items-start mb-3">
-                  <h3 className={`text-2xl font-bold transition-colors ${activeTab === 'milk' ? 'group-hover:text-green-600 text-gray-900' : 'group-hover:text-orange-600 text-gray-900'}`}>
+                  <h3 className={`text-xl font-bold transition-colors ${activeTab === 'milk' ? 'group-hover:text-green-600 text-gray-900' : 'group-hover:text-orange-600 text-gray-900'}`}>
                     {product.name}
                   </h3>
                   {product.price && (
-                    <span className="font-bold text-lg text-gray-900 bg-gray-100 px-3 py-1 rounded-lg">
+                    <span className="font-bold text-sm text-gray-900 bg-gray-100 px-3 py-1 rounded-lg whitespace-nowrap">
                       {product.price.split(' / ')[0]}
                     </span>
                   )}
                 </div>
                 
-                <p className="text-gray-600 text-lg leading-relaxed mb-6 flex-1">
+                <p className="text-gray-600 leading-relaxed mb-6 flex-1">
                   {product.description}
                 </p>
 
                 {activeTab === 'feed' && (
-                  <div className="space-y-4 mb-8 bg-orange-50/50 p-4 rounded-xl border border-orange-100">
+                  <div className="space-y-4 mb-6 bg-orange-50/50 p-4 rounded-xl border border-orange-100">
                     <div>
                       <span className="text-xs uppercase font-bold text-orange-600 tracking-wider">Benefits</span>
                       <p className="text-gray-700 text-sm mt-1 line-clamp-2">{product.benefits}</p>
@@ -255,19 +225,20 @@ export default function Products() {
                   </div>
                 )}
 
-                <button
+                <Button
                   onClick={() => setSelectedProduct(product)}
-                  className={`w-full py-3.5 mt-auto rounded-xl flex items-center justify-center font-bold text-lg transition-all duration-300 border-2 ${
+                  variant="outline"
+                  className={`w-full mt-auto rounded-xl group/btn ${
                     activeTab === 'milk'
-                      ? 'bg-green-50/50 text-green-700 border-green-100 hover:bg-green-600 hover:text-white hover:border-green-600'
-                      : 'bg-orange-50/50 text-orange-700 border-orange-100 hover:bg-orange-600 hover:text-white hover:border-orange-600'
+                      ? 'border-green-200 text-green-700 hover:bg-green-600 hover:text-white hover:border-green-600'
+                      : 'border-orange-200 text-orange-700 hover:bg-orange-600 hover:text-white hover:border-orange-600'
                   }`}
                 >
                   View Details
-                  <ChevronRight className="ml-2 h-5 w-5" />
-                </button>
-              </div>
-            </div>
+                  <ChevronRight className="ml-1 h-4 w-4 transition-transform group-hover/btn:translate-x-1" />
+                </Button>
+              </CardContent>
+            </Card>
           ))}
         </div>
 

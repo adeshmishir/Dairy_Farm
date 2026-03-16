@@ -89,8 +89,8 @@ export default function Home() {
       <div className="relative bg-white overflow-hidden">
         <div className="absolute inset-0">
           <img
-            src="https://images.pexels.com/photos/422218/pexels-photo-422218.jpeg?auto=compress&cs=tinysrgb&w=1600"
-            alt="Farm background"
+            src="https://images.pexels.com/photos/248412/pexels-photo-248412.jpeg?auto=compress&cs=tinysrgb&w=1600"
+            alt="Fresh Milk"
             className="w-full h-full object-cover opacity-10"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-white via-white/90 to-transparent"></div>
@@ -280,8 +280,8 @@ export default function Home() {
             <div className="bg-gradient-to-br from-green-400 to-green-600 rounded-3xl p-1">
               <div className="bg-white rounded-3xl p-8">
                 <img
-                  src="https://images.pexels.com/photos/1692693/pexels-photo-1692693.jpeg?auto=compress&cs=tinysrgb&w=800"
-                  alt="Fresh milk"
+                  src="https://res.cloudinary.com/dfect5qyk/image/upload/v1773684244/mishra_dairy_farm/gallery-7.jpg"
+                  alt="Our Farm Team"
                   className="rounded-2xl w-full h-96 object-cover shadow-lg"
                 />
               </div>

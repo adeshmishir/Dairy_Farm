@@ -1,155 +1,91 @@
+import { useEffect, useRef } from 'react';
 import { Globe, PackageOpen, Beef, CheckCircle } from 'lucide-react';
+
+// Custom hook for scroll-triggered animations
+function useScrollAnimation() {
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          el.classList.add('animate-visible');
+          observer.unobserve(el);
+        }
+      },
+      { threshold: 0.12 }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  return ref;
+}
+
+function AnimatedSection({ children, className = '', delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
+  const ref = useScrollAnimation();
+  return (
+    <div
+      ref={ref}
+      className={`scroll-section ${className}`}
+      style={{ transitionDelay: `${delay}ms` }}
+    >
+      {children}
+    </div>
+  );
+}
 
 export default function About() {
   return (
-    <div>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-        <div className="text-center mb-16">
-          <h1 className="text-5xl font-bold text-gray-900 mb-6">
-            We're here to create a{' '}
+    <>
+      <style>{`
+        .scroll-section {
+          opacity: 0;
+          transform: translateY(40px);
+          transition: opacity 0.7s ease-out, transform 0.7s ease-out;
+        }
+        .scroll-section.animate-visible {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      `}</style>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+
+        {/* Page Title */}
+        <AnimatedSection className="text-center mb-12">
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+            We're here to create a world{' '}
             <span className="inline-flex items-center">
-              <Globe className="h-12 w-12 text-green-600 mx-2" />
+              <Globe className="h-9 w-9 text-green-600 mx-2" />
             </span>
           </h1>
-          <h2 className="text-4xl font-bold text-gray-900 mb-8">
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-700 mb-6">
             where safe food is a norm, not an exception
           </h2>
-          <div className="h-1 w-32 bg-green-600 mx-auto"></div>
-        </div>
+          <div className="h-1 w-24 bg-green-600 mx-auto rounded-full"></div>
+        </AnimatedSection>
 
-        <div className="bg-[#FAF8F5] rounded-[3rem] p-10 lg:p-16 shadow-xl mb-20 relative overflow-hidden flex flex-col lg:flex-row gap-8 lg:gap-16 items-center border border-gray-100">
-          
-          {/* Decorative background circle on the left */}
-          <div className="absolute top-[-10%] bottom-[-10%] left-0 w-3/4 lg:w-1/2 bg-[#F3EFE9] rounded-r-full -translate-x-1/4 pointer-events-none hidden md:block"></div>
-
-          {/* Left Side Feature */}
-          <div className="lg:w-1/3 flex flex-col items-center justify-center text-center relative z-10 w-full mb-10 lg:mb-0">
-            <div className="relative w-72 h-72 mb-8 flex justify-center items-center">
-              {/* Abstract shape representing the yellow/blue hugging characters */}
-              <div className="absolute inset-4 bg-[#FFDB29] rounded-tl-[40%] rounded-tr-[55%] rounded-br-[45%] rounded-bl-[60%] shadow-sm transition-transform hover:scale-105 duration-500">
-                 {/* Face markings for yellow blob */}
-                 <div className="flex space-x-8 absolute top-[35%] left-1/2 -translate-x-1/2 opacity-70">
-                   <div className="w-5 h-2 border-b-[3px] border-black rounded-full rotate-[15deg] opacity-80"></div>
-                   <div className="w-5 h-2 border-b-[3px] border-black rounded-full -rotate-[15deg] opacity-80"></div>
-                 </div>
-                 {/* Blue baby blob */}
-                 <div className="bg-[#BCE3DD] w-36 h-36 rounded-tl-[55%] rounded-tr-[45%] rounded-br-[50%] rounded-bl-[45%] absolute bottom-4 left-1/2 transform -translate-x-1/2 shadow-inner flex items-center justify-center">
-                    {/* Face markings for blue blob */}
-                    <div className="flex space-x-6 absolute top-12 opacity-60">
-                      <div className="w-3 h-1 border-b-2 border-black rounded-full -rotate-12"></div>
-                      <div className="w-3 h-1 border-b-2 border-black rounded-full rotate-12"></div>
-                    </div>
-                 </div>
-                 {/* Cute little yellow hands wrapping around blue */}
-                 <div className="absolute bg-[#FFDB29] w-8 h-4 rounded-full bottom-20 right-10 rotate-45 shadow-sm"></div>
-                 <div className="absolute bg-[#FFDB29] w-8 h-4 rounded-full bottom-10 left-10 -rotate-45 shadow-sm"></div>
-              </div>
-            </div>
-            <h3 className="text-6xl font-extrabold text-gray-900 tracking-tight">Our Story</h3>
-          </div>
-
-          {/* Right Side Timeline */}
-          <div className="lg:w-2/3 relative w-full z-10 md:py-8">
-            {/* Vertical line for desktop */}
-            <div className="hidden md:block absolute left-1/2 top-4 bottom-4 w-px bg-gray-300 transform -translate-x-1/2 opacity-50 pointer-events-none"></div>
-
-            <div className="space-y-12 md:space-y-8 lg:space-y-12">
-              {[
-                {
-                  number: "1",
-                  color: "bg-[#FFE8A1] text-yellow-900 border-[#FFDB29]",
-                  text: "It began with a simple belief — milk should be pure, and farmers should be trusted."
-                },
-                {
-                  number: "2",
-                  color: "bg-[#BCE3DD] text-teal-900 border-[#8BC3BC]",
-                  text: "Like many families, we once struggled to find fresh and honest dairy products."
-                },
-                {
-                  number: "3",
-                  color: "bg-[#C4E5B8] text-green-900 border-[#A3D193]",
-                  text: "That moment made us realize something important: if pure milk was hard to find, we had to create it ourselves."
-                },
-                {
-                  number: "4",
-                  color: "bg-[#EBDCC5] text-amber-900 border-[#D4C3A6]",
-                  text: "With a few cattle, hard work, and a commitment to our animals, we started our dairy farm."
-                },
-                {
-                  number: "5",
-                  color: "bg-[#FFB5A7] text-red-900 border-[#E59A8D]",
-                  text: "Soon we understood that healthy cattle need the right nutrition, which led us to provide quality animal feed for farmers as well."
-                },
-                {
-                  number: "6",
-                  color: "bg-[#D6A2E8] text-purple-900 border-[#BC85D1]",
-                  text: "Today, our farm is more than a business. It is a promise — to care for our animals, support farmers, and deliver milk that families can truly trust. Every drop carries that promise. 🐄🌾"
-                }
-              ].map((step, index) => {
-                const isLeft = index % 2 === 0;
-                return (
-                  <div key={index} className="flex flex-col md:flex-row items-center justify-center w-full relative z-10 group">
-                    
-                    {/* Left half text */}
-                    <div className={`w-full md:w-1/2 order-2 md:order-1 ${isLeft ? 'md:pr-10 md:text-right text-center' : 'hidden md:block'}`}>
-                      {isLeft && (
-                        <p className="text-gray-800 font-medium leading-relaxed text-[17px] md:text-lg">
-                          {step.text}
-                        </p>
-                      )}
-                    </div>
-
-                    {/* Center Circle */}
-                    <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-xl flex-shrink-0 mx-auto md:mx-0 shadow-sm border-2 ${step.color} order-1 md:order-2 mb-4 md:mb-0 group-hover:scale-110 transition-transform duration-300`}>
-                      {step.number}
-                    </div>
-
-                    {/* Right half text */}
-                    <div className={`w-full md:w-1/2 order-3 md:order-3 ${!isLeft ? 'md:pl-10 md:text-left text-center' : 'hidden md:block'}`}>
-                      {!isLeft && (
-                        <p className="text-gray-800 font-medium leading-relaxed text-[17px] md:text-lg">
-                          {step.text}
-                        </p>
-                      )}
-                    </div>
-
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-
-        <div className="grid md:grid-cols-2 gap-12 mb-20">
-          <div className="bg-white rounded-3xl p-10 shadow-xl border-2 border-green-100">
-            <div className="mb-8">
-              <div className="bg-green-600 w-16 h-16 rounded-2xl flex items-center justify-center mb-6">
-                <PackageOpen className="h-8 w-8 text-white" />
-              </div>
-              <h3 className="text-3xl font-bold text-gray-900 mb-4">Our Mission</h3>
-              <p className="text-gray-700 text-lg leading-relaxed mb-6">
-                At Mishra Dairy Farm, we believe that everyone deserves access to pure, safe, and nutritious food. We're committed to raising the bar for dairy quality and animal care.
-              </p>
-              <p className="text-gray-700 text-lg leading-relaxed">
-                Every day, we work tirelessly to ensure that our milk and milk products meet the highest standards of purity and safety. Our rigorous testing protocols and commitment to transparency set us apart.
-              </p>
-            </div>
-          </div>
-
-          <div className="bg-gradient-to-br from-green-600 to-green-700 rounded-3xl p-10 shadow-xl text-white overflow-hidden">
-            <h3 className="text-3xl font-bold mb-6 text-center md:text-left">Meet Our Owner</h3>
-            <div className="flex flex-col md:flex-row gap-8 items-center md:items-start">
-              <div className="w-48 h-48 flex-shrink-0">
-                <img 
-                  src="https://res.cloudinary.com/dfect5qyk/image/upload/v1773684235/mishra_dairy_farm/founder.png" 
-                  alt="Suneel Mishra - Founder" 
+        {/* ── Meet Our Owner (NOW FIRST) ── */}
+        <AnimatedSection className="mb-14" delay={100}>
+          <div className="bg-gradient-to-br from-green-600 to-green-700 rounded-3xl p-8 md:p-12 shadow-xl text-white overflow-hidden">
+            <h3 className="text-3xl font-bold mb-8 text-center md:text-left">Meet Our Owner</h3>
+            <div className="flex flex-col md:flex-row gap-8 items-center">
+              <div className="w-40 h-40 md:w-48 md:h-48 flex-shrink-0">
+                <img
+                  src="https://res.cloudinary.com/dfect5qyk/image/upload/v1773684235/mishra_dairy_farm/founder.png"
+                  alt="Suneel Mishra - Founder"
                   className="w-full h-full object-cover rounded-2xl shadow-lg border-4 border-green-500/30"
                 />
               </div>
-              <div className="space-y-4 flex-1 text-center md:text-left">
+              <div className="space-y-3 flex-1 text-center md:text-left">
                 <div>
-                  <h4 className="text-xl font-semibold mb-1 opacity-95">Suneel Mishra</h4>
-                  <p className="text-lg opacity-80 font-medium">Founder & Owner</p>
+                  <h4 className="text-2xl font-bold opacity-95">Suneel Mishra</h4>
+                  <p className="text-lg opacity-75 font-medium">Founder &amp; Owner</p>
                 </div>
                 <div className="h-px bg-white/20 w-full"></div>
                 <p className="text-lg leading-relaxed opacity-90">
@@ -161,91 +97,121 @@ export default function About() {
               </div>
             </div>
           </div>
-        </div>
+        </AnimatedSection>
 
-        {/* Why Choose Us Section */}
-        <div className="bg-gradient-to-br from-white to-green-50 rounded-3xl shadow-xl overflow-hidden border-2 border-green-100 mb-20">
-          <div className="grid lg:grid-cols-5">
-            <div className="lg:col-span-2 bg-[url('https://images.pexels.com/photos/10141619/pexels-photo-10141619.jpeg?auto=compress&cs=tinysrgb&w=800')] bg-cover bg-center min-h-[400px]">
-              <div className="h-full w-full bg-gradient-to-r from-green-900/80 to-green-800/80 p-12 flex flex-col justify-center">
-                <h3 className="text-4xl font-bold text-white mb-6">Why Choose<br/>Our Farm?</h3>
-                <p className="text-green-50 text-lg leading-relaxed opacity-90">
-                  We don't just sell milk; we provide peace of mind. Here is why thousands of families and local farmers trust Mishra Dairy Farm every single day.
-                </p>
-              </div>
-            </div>
-            
-            <div className="lg:col-span-3 p-12 lg:p-16 flex flex-col justify-center bg-white">
-              <div className="space-y-6">
-                {[
-                  { title: "Fresh milk directly from farm", desc: "Straight from our udders to your chilled bottles within hours." },
-                  { title: "High nutrition animal feed", desc: "Scientifically balanced feed ensuring optimal cattle health." },
-                  { title: "Trusted by local farmers", desc: "A community pillar for over a decade serving regional needs." },
-                  { title: "Hygienic milk production", desc: "Zero human touch and rigorous lab testing for every batch." },
-                  { title: "Affordable prices", desc: "Premium quality without the premium price tag." }
-                ].map((item, index) => (
-                  <div key={index} className="flex items-start space-x-4 group p-4 rounded-2xl hover:bg-green-50 transition-colors">
-                    <div className="flex-shrink-0 mt-1">
-                      <CheckCircle className="h-8 w-8 text-green-500 group-hover:scale-110 transition-transform" />
-                    </div>
-                    <div>
-                      <h4 className="text-xl font-bold text-gray-900 mb-1 group-hover:text-green-700 transition-colors">{item.title}</h4>
-                      <p className="text-gray-600 leading-relaxed">{item.desc}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
+        {/* ── Our Story (COMPACT VERSION, NOW SECOND) ── */}
+        <AnimatedSection className="mb-14" delay={100}>
+          <div className="bg-[#FAF8F5] rounded-3xl p-8 md:p-12 shadow-lg border border-gray-100 relative overflow-hidden">
+            <h3 className="text-3xl font-bold text-gray-900 mb-8 text-center">Our Story</h3>
+
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {[
+                { number: "1", color: "bg-[#FFE8A1] text-yellow-900 border-[#FFDB29]", text: "It began with a simple belief — milk should be pure, and farmers should be trusted." },
+                { number: "2", color: "bg-[#BCE3DD] text-teal-900 border-[#8BC3BC]", text: "Like many families, we once struggled to find fresh and honest dairy products." },
+                { number: "3", color: "bg-[#C4E5B8] text-green-900 border-[#A3D193]", text: "That moment made us realize: if pure milk was hard to find, we had to create it ourselves." },
+                { number: "4", color: "bg-[#EBDCC5] text-amber-900 border-[#D4C3A6]", text: "With a few cattle, hard work, and commitment, we started our dairy farm." },
+                { number: "5", color: "bg-[#FFB5A7] text-red-900 border-[#E59A8D]", text: "Healthy cattle need the right nutrition — so we also provide quality animal feed for farmers." },
+                { number: "6", color: "bg-[#D6A2E8] text-purple-900 border-[#BC85D1]", text: "Today, our farm is a promise — to care for animals, support farmers, and deliver milk families trust. 🐄🌾" },
+              ].map((step, i) => (
+                <div key={i} className={`rounded-2xl p-5 border-2 flex gap-4 items-start ${step.color}`}>
+                  <span className={`flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center font-bold text-base border-2 ${step.color}`}>{step.number}</span>
+                  <p className="text-sm md:text-base font-medium leading-relaxed">{step.text}</p>
+                </div>
+              ))}
             </div>
           </div>
-        </div>
+        </AnimatedSection>
 
-        <div className="bg-white rounded-3xl shadow-2xl overflow-hidden border-2 border-green-100 mb-20">
-          <div className="bg-gradient-to-r from-green-600 to-green-700 px-10 py-6">
-            <h3 className="text-3xl font-bold text-white">Our Products</h3>
-          </div>
-          <div className="p-10">
-            <div className="grid md:grid-cols-2 gap-8">
-              <div className="flex items-start space-x-4">
-                <div className="bg-green-100 rounded-xl p-3 mt-1">
-                  <PackageOpen className="h-8 w-8 text-green-600" />
-                </div>
-                <div>
-                  <h4 className="text-2xl font-bold text-gray-900 mb-3">Milk & Milk Products</h4>
-                  <p className="text-gray-700 text-lg leading-relaxed">
-                    Premium quality milk, fresh daily. We also offer a range of dairy products including curd, paneer, ghee, and more. Every product undergoes rigorous quality testing.
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start space-x-4">
-                <div className="bg-orange-100 rounded-xl p-3 mt-1">
-                  <Beef className="h-8 w-8 text-orange-600" />
-                </div>
-                <div>
-                  <h4 className="text-2xl font-bold text-gray-900 mb-3">Animal Feed</h4>
-                  <p className="text-gray-700 text-lg leading-relaxed">
-                    <span className="font-semibold text-orange-600">
-                      "To feed your animals as if they were our own."
-                    </span>
-                    <br />
-                    Premium quality animal feed formulated for optimal nutrition and health.
-                  </p>
-                </div>
-              </div>
+        {/* ── Mission ── */}
+        <AnimatedSection className="mb-14" delay={100}>
+          <div className="bg-white rounded-3xl p-8 md:p-10 shadow-xl border-2 border-green-100">
+            <div className="bg-green-600 w-14 h-14 rounded-2xl flex items-center justify-center mb-5">
+              <PackageOpen className="h-7 w-7 text-white" />
             </div>
-          </div>
-        </div>
-
-
-
-        <div className="mt-16 text-center">
-          <div className="inline-block bg-gradient-to-r from-green-600 to-green-700 rounded-full px-10 py-4 shadow-lg">
-            <p className="text-white font-bold text-xl">
-              Mishra Dairy Farm - Pure. Safe. Tested.
+            <h3 className="text-2xl font-bold text-gray-900 mb-4">Our Mission</h3>
+            <p className="text-gray-700 text-lg leading-relaxed mb-4">
+              At Mishra Dairy Farm, we believe that everyone deserves access to pure, safe, and nutritious food. We're committed to raising the bar for dairy quality and animal care.
+            </p>
+            <p className="text-gray-700 text-lg leading-relaxed">
+              Every day, we work tirelessly to ensure our milk and milk products meet the highest standards of purity and safety. Our rigorous testing protocols and commitment to transparency set us apart.
             </p>
           </div>
-        </div>
+        </AnimatedSection>
+
+        {/* ── Why Choose Us ── */}
+        <AnimatedSection className="mb-14" delay={100}>
+          <div className="bg-gradient-to-br from-white to-green-50 rounded-3xl shadow-xl overflow-hidden border-2 border-green-100">
+            <div className="grid lg:grid-cols-5">
+              <div className="lg:col-span-2 bg-[url('https://images.pexels.com/photos/10141619/pexels-photo-10141619.jpeg?auto=compress&cs=tinysrgb&w=800')] bg-cover bg-center min-h-[280px]">
+                <div className="h-full w-full bg-gradient-to-r from-green-900/80 to-green-800/80 p-10 flex flex-col justify-center">
+                  <h3 className="text-3xl font-bold text-white mb-4">Why Choose<br/>Our Farm?</h3>
+                  <p className="text-green-50 text-base leading-relaxed opacity-90">
+                    We don't just sell milk; we provide peace of mind. Here is why thousands of families and local farmers trust us.
+                  </p>
+                </div>
+              </div>
+              <div className="lg:col-span-3 p-8 md:p-12 flex flex-col justify-center bg-white">
+                <div className="space-y-4">
+                  {[
+                    { title: "Fresh milk directly from farm", desc: "Straight from our farm to your chilled bottles within hours." },
+                    { title: "High nutrition animal feed", desc: "Scientifically balanced feed ensuring optimal cattle health." },
+                    { title: "Trusted by local farmers", desc: "A community pillar serving regional needs for over a decade." },
+                    { title: "Hygienic milk production", desc: "Zero human touch with rigorous lab testing for every batch." },
+                    { title: "Affordable prices", desc: "Premium quality without the premium price tag." },
+                  ].map((item, i) => (
+                    <div key={i} className="flex items-start space-x-4 group p-3 rounded-xl hover:bg-green-50 transition-colors">
+                      <CheckCircle className="h-6 w-6 text-green-500 flex-shrink-0 mt-0.5 group-hover:scale-110 transition-transform" />
+                      <div>
+                        <h4 className="text-lg font-bold text-gray-900 group-hover:text-green-700 transition-colors">{item.title}</h4>
+                        <p className="text-gray-600 text-sm">{item.desc}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </AnimatedSection>
+
+        {/* ── Our Products ── */}
+        <AnimatedSection className="mb-14" delay={100}>
+          <div className="bg-white rounded-3xl shadow-2xl overflow-hidden border-2 border-green-100">
+            <div className="bg-gradient-to-r from-green-600 to-green-700 px-8 py-5">
+              <h3 className="text-2xl font-bold text-white">Our Products</h3>
+            </div>
+            <div className="p-8">
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="flex items-start space-x-4">
+                  <div className="bg-green-100 rounded-xl p-3 mt-1 flex-shrink-0">
+                    <PackageOpen className="h-7 w-7 text-green-600" />
+                  </div>
+                  <div>
+                    <h4 className="text-xl font-bold text-gray-900 mb-2">Milk &amp; Milk Products</h4>
+                    <p className="text-gray-700 leading-relaxed">Premium quality milk, fresh daily. We also offer curd, paneer, ghee, and more — each rigorously quality tested.</p>
+                  </div>
+                </div>
+                <div className="flex items-start space-x-4">
+                  <div className="bg-orange-100 rounded-xl p-3 mt-1 flex-shrink-0">
+                    <Beef className="h-7 w-7 text-orange-600" />
+                  </div>
+                  <div>
+                    <h4 className="text-xl font-bold text-gray-900 mb-2">Animal Feed</h4>
+                    <p className="text-gray-700 leading-relaxed"><span className="font-semibold text-orange-600">"To feed your animals as if they were our own."</span><br />Premium quality feed formulated for optimal nutrition and health.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </AnimatedSection>
+
+        {/* ── Tagline ── */}
+        <AnimatedSection className="text-center" delay={100}>
+          <div className="inline-block bg-gradient-to-r from-green-600 to-green-700 rounded-full px-10 py-4 shadow-lg">
+            <p className="text-white font-bold text-xl">Mishra Dairy Farm — Pure. Safe. Tested.</p>
+          </div>
+        </AnimatedSection>
+
       </div>
-    </div>
+    </>
   );
 }
