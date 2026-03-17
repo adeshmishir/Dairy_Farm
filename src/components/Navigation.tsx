@@ -1,13 +1,12 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu } from 'lucide-react';
+import { Menu, LogOut, User as UserIcon, Settings, LogIn, UserPlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetClose } from '@/components/ui/sheet';
+import { useAuth } from '../lib/auth';
 
 const navLinks = [
   { name: 'Home', path: '/' },
-  { name: 'Products', path: '/products' },
-  { name: 'We Care', path: '/we-care' },
   { name: 'About Us', path: '/about' },
   { name: 'Gallery', path: '/gallery' }
 ];
@@ -21,21 +20,22 @@ const WhatsAppSVG = () => (
 export default function Navigation() {
   const location = useLocation();
   const [open, setOpen] = useState(false);
+  const { user, logout } = useAuth();
 
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <nav className="bg-white/95 backdrop-blur-sm shadow-md sticky top-0 z-50 border-b border-gray-100">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-20">
+    <nav className="bg-[#02110b]/95 backdrop-blur-sm shadow-lg sticky top-3 z-50 mx-4 rounded-2xl border border-white/10">
+      <div className="max-w-[1600px] mx-auto px-4 sm:px-8 lg:px-12">
+        <div className="flex justify-between items-center h-14">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-3 group z-50">
-            <div className="bg-white rounded-full p-1 overflow-hidden h-14 w-14 flex items-center justify-center border-2 border-green-100 group-hover:border-green-300 transition-all duration-300 shadow-sm">
+            <div className="bg-green-500/10 rounded-full p-1 overflow-hidden h-14 w-14 flex items-center justify-center border-2 border-green-500/20 group-hover:border-green-400 transition-all duration-300 shadow-sm backdrop-blur-sm">
               <img src="/logo.png" alt="Mishra Dairy Farm Logo" className="h-full w-full object-contain" />
             </div>
             <div>
-              <h1 className="text-xl md:text-2xl font-bold text-gray-900 group-hover:text-green-700 transition-colors">Mishra Dairy Farm</h1>
-              <p className="text-[10px] md:text-xs font-semibold text-green-600 tracking-wider uppercase">Pure. Fresh. Always.</p>
+            <h1 className="text-lg md:text-xl font-bold text-white group-hover:text-green-400 transition-colors">Mishra Dairy Farm</h1>
+              <p className="text-[10px] md:text-xs font-semibold text-green-500 tracking-wider uppercase">Pure. Fresh. Always.</p>
             </div>
           </Link>
 
@@ -48,17 +48,90 @@ export default function Navigation() {
                 className={`px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 ${
                   isActive(link.path)
                     ? 'bg-green-600 text-white shadow-md'
-                    : 'text-gray-700 hover:bg-green-50 hover:text-green-700'
+                    : 'text-green-100/70 hover:bg-green-800/50 hover:text-green-300'
                 }`}
               >
                 {link.name}
               </Link>
             ))}
-            {/* Desktop WhatsApp button */}
-            <Button variant="whatsapp" size="sm" className="ml-4 flex items-center gap-2 rounded-lg shadow-md font-bold" asChild>
-              <a href="https://wa.me/918435704159" target="_blank" rel="noopener noreferrer">
+
+            {user?.isAdmin && (
+              <Link
+                to="/admin"
+                className={`px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 ${
+                  isActive('/admin')
+                    ? 'bg-purple-600 text-white shadow-md'
+                    : 'text-purple-300 hover:bg-purple-900/50'
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <Settings size={16} />
+                  Admin
+                </div>
+              </Link>
+            )}
+
+            {/* Authentication Dropdown */}
+            <div className="relative group ml-4">
+              <div className="flex items-center gap-2 cursor-pointer py-2">
+                {user ? (
+                  <div className="flex items-center gap-3 px-4 py-2 bg-green-900/50 border border-green-700/50 rounded-2xl group-hover:bg-green-800/50 transition-all">
+                    <div className="h-7 w-7 bg-green-600 rounded-xl flex items-center justify-center text-white font-bold text-sm">
+                      {user.name.charAt(0)}
+                    </div>
+                    <span className="text-sm font-black text-green-300">{user.name}</span>
+                  </div>
+                ) : (
+                  <div className="h-9 w-9 bg-green-900/50 rounded-full flex items-center justify-center text-green-400 group-hover:bg-green-600 group-hover:text-white transition-all shadow-sm border border-green-700/30">
+                    <UserIcon size={18} />
+                  </div>
+                )}
+              </div>
+
+              {/* Hover Dropdown Menu */}
+              <div className="absolute right-0 top-full pt-2 opacity-0 translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto transition-all duration-200 z-[60]">
+                <div className="w-56 bg-[#0a2318] border border-white/10 rounded-[1.5rem] shadow-2xl p-2 overflow-hidden">
+                  {user ? (
+                    <div className="space-y-1">
+                      <div className="px-4 py-3 border-b border-white/5 mb-1">
+                        <p className="text-[10px] font-black text-green-400/70 uppercase tracking-widest">Account</p>
+                        <p className="text-sm font-bold text-white truncate">{user.email}</p>
+                      </div>
+                      <button 
+                        onClick={logout} 
+                        className="w-full flex items-center gap-3 px-4 py-3 text-red-400 hover:bg-red-900/30 rounded-xl transition-colors font-bold text-sm"
+                      >
+                        <LogOut size={18} />
+                        Logout
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="space-y-1">
+                      <p className="px-4 py-2 text-[10px] font-black text-green-400/50 uppercase tracking-widest">Welcome</p>
+                      <Link 
+                        to="/auth" 
+                        className="flex items-center gap-3 px-4 py-3 text-green-100/70 hover:bg-green-800/50 hover:text-green-300 rounded-xl transition-colors font-bold text-sm"
+                      >
+                        <LogIn size={18} className="text-green-500" />
+                        Sign In
+                      </Link>
+                      <Link 
+                        to="/auth?tab=signup" 
+                        className="flex items-center gap-3 px-4 py-3 text-green-100/70 hover:bg-green-800/50 hover:text-green-300 rounded-xl transition-colors font-bold text-sm"
+                      >
+                        <UserPlus size={18} className="text-green-500" />
+                        Create Account
+                      </Link>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Desktop WhatsApp icon button */}
+            <Button variant="whatsapp" className="ml-4 h-11 w-11 p-0 rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform" asChild title="WhatsApp">
+              <a href="https://wa.me/918953280445" target="_blank" rel="noopener noreferrer">
                 <WhatsAppSVG />
-                <span>WhatsApp</span>
               </a>
             </Button>
           </div>
@@ -67,47 +140,96 @@ export default function Navigation() {
           <div className="md:hidden flex items-center">
             <Sheet open={open} onOpenChange={setOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="text-gray-700">
+                <Button variant="ghost" size="icon" className="text-white">
                   <Menu className="h-7 w-7" />
                   <span className="sr-only">Open Menu</span>
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-72 flex flex-col">
-                <SheetHeader className="mb-6">
+              <SheetContent side="right" className="w-72 flex flex-col bg-[#02110b] border-l border-white/10 p-0 overflow-hidden">
+                <div className="p-6 flex flex-col h-full">
+                <SheetHeader className="mb-8 p-0 text-left">
                   <div className="flex items-center space-x-3">
-                    <img src="/logo.png" alt="Logo" className="h-12 w-12 rounded-full border-2 border-green-100" />
+                    <div className="bg-green-500/10 rounded-full p-1 h-12 w-12 flex-shrink-0 border border-green-500/20 flex items-center justify-center backdrop-blur-sm">
+                      <img src="/logo.png" alt="Logo" className="h-full w-full object-contain" />
+                    </div>
                     <div>
-                      <SheetTitle className="text-gray-900 text-lg">Mishra Dairy Farm</SheetTitle>
-                      <p className="text-xs text-green-600 font-semibold tracking-wider uppercase">Pure. Fresh. Always.</p>
+                      <SheetTitle className="text-white text-lg font-bold">Mishra Dairy Farm</SheetTitle>
+                      <p className="text-[10px] text-green-500 font-bold tracking-widest uppercase">Pure. Fresh. Always.</p>
                     </div>
                   </div>
                 </SheetHeader>
 
                 <div className="flex flex-col space-y-2 flex-1">
+                  {user && (
+                    <div className="px-4 py-3 bg-green-500/10 rounded-xl border border-green-500/10 mb-4">
+                      <div className="flex items-center gap-3">
+                        <UserIcon size={18} className="text-green-400" />
+                        <div className="flex flex-col overflow-hidden">
+                          <span className="text-[10px] text-green-500/40 font-black uppercase tracking-widest">Signed in as</span>
+                          <span className="text-sm font-bold text-white truncate">{user.name}</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
                   {navLinks.map((link) => (
                     <SheetClose asChild key={link.path}>
                       <Link
                         to={link.path}
-                        className={`flex items-center px-4 py-3.5 rounded-xl font-semibold text-base transition-all duration-200 ${
+                        className={`flex items-center px-5 py-4 rounded-xl font-bold text-base transition-all duration-200 ${
                           isActive(link.path)
-                            ? 'bg-green-600 text-white shadow-md'
-                            : 'text-gray-700 hover:bg-green-50 hover:text-green-700'
+                            ? 'bg-green-600 text-white shadow-lg'
+                            : 'text-green-100/60 hover:bg-white/5 hover:text-white'
                         }`}
                       >
                         {link.name}
                       </Link>
                     </SheetClose>
                   ))}
+
+                  {user?.isAdmin && (
+                    <SheetClose asChild>
+                      <Link
+                        to="/admin"
+                        className={`flex items-center px-5 py-4 rounded-xl font-bold text-base transition-all duration-200 mt-2 ${
+                          isActive('/admin')
+                            ? 'bg-purple-600 text-white shadow-lg'
+                            : 'text-purple-300 hover:bg-purple-900/30'
+                        }`}
+                      >
+                        <Settings size={20} className="mr-3" />
+                        Admin Panel
+                      </Link>
+                    </SheetClose>
+                  )}
+
+                  {!user && (
+                    <SheetClose asChild>
+                      <Link
+                        to="/auth"
+                        className="flex items-center px-5 py-4 rounded-xl font-bold bg-green-900/30 text-green-400 border border-green-700/30 mt-4"
+                      >
+                        <LogIn size={20} className="mr-3" />
+                        Sign In / Sign Up
+                      </Link>
+                    </SheetClose>
+                  )}
                 </div>
 
-                {/* WhatsApp in Mobile Sidebar */}
-                <div className="pt-4 border-t border-gray-100 mt-4">
-                  <Button variant="whatsapp" className="w-full flex items-center gap-2 rounded-xl py-5 text-base font-bold shadow-lg" asChild>
-                    <a href="https://wa.me/918435704159" target="_blank" rel="noopener noreferrer">
+                <div className="pt-6 border-t border-white/5 space-y-4">
+                  {user && (
+                    <Button variant="outline" className="w-full text-red-400 border-red-900/30 hover:bg-red-900/20 rounded-2xl py-6 font-bold" onClick={() => { logout(); setOpen(false); }}>
+                      <LogOut size={20} className="mr-3" />
+                      Sign Out
+                    </Button>
+                  )}
+                  <Button variant="whatsapp" className="w-full flex items-center justify-center gap-3 rounded-2xl py-6 shadow-xl h-auto" asChild>
+                    <a href="https://wa.me/918953280445" target="_blank" rel="noopener noreferrer">
                       <WhatsAppSVG />
-                      Chat on WhatsApp
+                      <span className="font-bold">Chat on WhatsApp</span>
                     </a>
                   </Button>
+                </div>
                 </div>
               </SheetContent>
             </Sheet>
