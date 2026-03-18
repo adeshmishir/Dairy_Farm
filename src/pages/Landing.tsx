@@ -47,7 +47,10 @@ export default function Landing() {
   };
 
   return (
-    <div className="min-h-screen bg-[#02110b] flex flex-col overflow-x-hidden relative selection:bg-green-500/30">
+    <div 
+      onClick={handleExplore}
+      className="min-h-screen bg-[#02110b] flex flex-col overflow-x-hidden relative selection:bg-green-500/30 cursor-pointer"
+    >
       {/* ── BACKGROUND LAYER ── */}
       <div 
         className="fixed inset-0 z-0 scale-105"
@@ -76,8 +79,7 @@ export default function Landing() {
           
           {/* Logo */}
           <div 
-            onClick={handleExplore}
-            className="land-anim relative mb-10 cursor-pointer group/logo"
+            className="land-anim relative mb-10 group/logo"
           >
             <div className="w-40 h-40 mx-auto transition-all duration-500 group-hover/logo:scale-110 group-hover/logo:rotate-3 flex items-center justify-center rounded-full overflow-hidden">
               <img
@@ -93,8 +95,7 @@ export default function Landing() {
           {/* Name & Explore */}
           <div className="land-anim flex flex-col items-center">
             <div 
-              onClick={handleExplore}
-              className="group cursor-pointer select-none relative mb-12"
+              className="group select-none relative mb-12"
             >
               <h1 className="text-6xl sm:text-8xl md:text-[11rem] font-black tracking-tighter transition-all duration-1000 flex flex-col items-center">
                 <span className="block leading-none -mb-6 text-[#fdfcf0]/50 group-hover:text-white group-hover:drop-shadow-[0_0_20px_rgba(255,255,255,0.3)] group-hover:-translate-y-4 transition-all duration-1000 ease-out italic font-serif mix-blend-overlay filter brightness-110">
@@ -112,20 +113,12 @@ export default function Landing() {
               </div>
             </div>
 
-            {/* Clear Action Button */}
-            <button
-              onClick={handleExplore}
-              className="group relative px-12 py-5 bg-green-600 hover:bg-green-500 text-white rounded-full font-black text-xl tracking-tight shadow-[0_20px_50px_rgba(22,163,74,0.3)] hover:shadow-[0_25px_60px_rgba(22,163,74,0.6)] transition-all duration-500 transform hover:-translate-y-1 active:scale-95 flex items-center gap-4 overflow-hidden mt-4"
-            >
-              <span className="relative z-10 uppercase tracking-widest text-sm">Explore Products</span>
-              <div className="relative z-10 w-8 h-8 bg-white/20 rounded-full flex items-center justify-center transition-transform duration-500 group-hover:translate-x-1">
-                <svg viewBox="0 0 24 24" className="w-5 h-5 fill-none stroke-current stroke-[3px]" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M5 12h14M12 5l7 7-7 7" />
-                </svg>
-              </div>
-              {/* Shine effect */}
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-            </button>
+            {/* Click Anywhere Prompt */}
+            <div className="animate-pulse flex items-center gap-3 text-green-400/60 font-black tracking-[0.2em] uppercase text-xs mt-8">
+              <span className="w-8 h-[1px] bg-green-400/20"></span>
+              Click anywhere to enter
+              <span className="w-8 h-[1px] bg-green-400/20"></span>
+            </div>
           </div>
 
           <style>{`
