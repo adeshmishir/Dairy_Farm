@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, LogOut, User as UserIcon, Settings, LogIn, UserPlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetClose } from '@/components/ui/sheet';
@@ -19,8 +19,14 @@ const WhatsAppSVG = () => (
 
 export default function Navigation() {
   const location = useLocation();
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const { user, logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -98,7 +104,7 @@ export default function Navigation() {
                         <p className="text-sm font-bold text-white truncate">{user.email}</p>
                       </div>
                       <button 
-                        onClick={logout} 
+                        onClick={handleLogout} 
                         className="w-full flex items-center gap-3 px-4 py-3 text-red-400 hover:bg-red-900/30 rounded-xl transition-colors font-bold text-sm"
                       >
                         <LogOut size={18} />
@@ -218,7 +224,7 @@ export default function Navigation() {
 
                 <div className="pt-6 border-t border-white/5 space-y-4">
                   {user && (
-                    <Button variant="outline" className="w-full text-red-400 border-red-900/30 hover:bg-red-900/20 rounded-2xl py-6 font-bold" onClick={() => { logout(); setOpen(false); }}>
+                    <Button variant="outline" className="w-full text-red-400 border-red-900/30 hover:bg-red-900/20 rounded-2xl py-6 font-bold" onClick={() => { handleLogout(); setOpen(false); }}>
                       <LogOut size={20} className="mr-3" />
                       Sign Out
                     </Button>

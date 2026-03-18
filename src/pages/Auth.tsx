@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useAuth } from '../lib/auth';
 import { Mail, Lock, User, ArrowRight } from 'lucide-react';
+import { GoogleLogin } from '@react-oauth/google';
 
 const Auth = () => {
   const [searchParams] = useSearchParams();
@@ -45,6 +46,28 @@ const Auth = () => {
       navigate('/');
     } catch (error: any) {
       toast.error(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleSuccess = async (credentialResponse: any) => {
+    setLoading(true);
+    try {
+      const response = await fetch(`http://localhost:5000/api/auth/google`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ credential: credentialResponse.credential }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || 'Google Auth failed');
+
+      login(data.user, data.token);
+      toast.success('Signed in with Google! 🚀');
+      navigate('/');
+    } catch (err: any) {
+      toast.error(err.message);
     } finally {
       setLoading(false);
     }
@@ -117,6 +140,26 @@ const Auth = () => {
             </button>
           </div>
         </form>
+
+        <div className="relative my-6">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-white/10"></div>
+          </div>
+          <div className="relative flex justify-center text-sm">
+            <span className="px-2 bg-[#0a2318] text-green-100/30 font-medium">Or continue with</span>
+          </div>
+        </div>
+
+        <div className="flex justify-center">
+          <GoogleLogin
+            onSuccess={handleGoogleSuccess}
+            onError={() => toast.error('Google login failed')}
+            theme="filled_black"
+            shape="pill"
+            text="continue_with"
+            width="100%"
+          />
+        </div>
 
         <div className="text-center">
           <button

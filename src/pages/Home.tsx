@@ -190,16 +190,7 @@ export default function Home() {
                 alt="Fresh Milk Pouring"
                 className="relative rounded-[3rem] shadow-2xl object-cover w-full h-[500px] border-4 border-white/10"
               />
-              {/* Floating Badge */}
-              <div className="absolute -bottom-6 -left-6 bg-[#0a2318] p-6 rounded-3xl shadow-xl flex items-center space-x-4 border border-white/5 backdrop-blur-md">
-                <div className="bg-green-500/20 p-3 rounded-2xl">
-                  <Shield className="w-8 h-8 text-green-400" />
-                </div>
-                <div>
-                  <p className="font-bold text-white text-lg">100% Pure</p>
-                  <p className="text-green-100/50 text-sm">Farm to Table</p>
-                </div>
-              </div>
+             
             </div>
           </div>
         </div>

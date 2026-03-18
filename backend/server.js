@@ -7,7 +7,10 @@ const bcrypt = require('bcryptjs');
 const multer = require('multer');
 const { Readable } = require('stream');
 const nodemailer = require('nodemailer');
+const { OAuth2Client } = require('google-auth-library');
 require('dotenv').config();
+
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -83,7 +86,7 @@ const auth = (req, res, next) => {
 const userSchema = new mongoose.Schema({
   name:     { type: String, required: true },
   email:    { type: String, required: true, unique: true },
-  password: { type: String, required: true },
+  password: { type: String, required: false },
   isAdmin:  { type: Boolean, default: false },
 });
 const User = mongoose.model('User', userSchema);
@@ -161,6 +164,43 @@ app.post('/api/auth/login', async (req, res) => {
   } catch (err) {
     console.error('Login error:', err);
     res.status(500).json({ message: 'Login failed' });
+  }
+});
+
+app.post('/api/auth/google', async (req, res) => {
+  try {
+    const { credential } = req.body;
+    const ticket = await googleClient.verifyIdToken({
+      idToken: credential,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+    const payload = ticket.getPayload();
+    const { email, name, picture } = payload;
+
+    let user = await User.findOne({ email });
+    if (!user) {
+      const isAdmin = email === 'mishradairyfarm4@gmail.com';
+      user = await new User({ name, email, isAdmin }).save();
+      
+      // Welcome Email for new Google Users
+      sendMail(email, 'Welcome to Mishra Dairy Farm! 🥛', `
+        <div style="font-family: sans-serif; max-width: 600px; margin: auto; border: 1px solid #eee; padding: 20px; border-radius: 20px;">
+          <h2 style="color: #166534;">Namaste ${name}! 🙏</h2>
+          <p>Thank you for joining <b>Mishra Dairy Farm</b> via Google. We are thrilled to have you!</p>
+          <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
+          <p style="font-size: 12px; color: #666;">
+            <b>Mishra Dairy Farm</b><br>
+            Contact: +91 8953280445
+          </p>
+        </div>
+      `);
+    }
+
+    const token = jwt.sign({ id: user._id, email: user.email, isAdmin: user.isAdmin }, JWT_SECRET, { expiresIn: '7d' });
+    res.status(200).json({ token, user: { name: user.name, email: user.email, isAdmin: user.isAdmin } });
+  } catch (err) {
+    console.error('Google login error:', err);
+    res.status(500).json({ message: 'Google login failed' });
   }
 });
 
