@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useAuth } from '../lib/auth';
+
+const API = (import.meta.env.VITE_API_URL as string) || 'http://localhost:5000/api';
 import { Mail, Lock, User, ArrowRight } from 'lucide-react';
 import { GoogleLogin } from '@react-oauth/google';
 
@@ -27,7 +29,7 @@ const Auth = () => {
       const endpoint = isLogin ? '/auth/login' : '/auth/signup';
       const body = isLogin ? { email, password } : { name, email, password };
       
-      const response = await fetch(`https://dairy-farm-n2sj.onrender.com/api${endpoint}`, {
+      const response = await fetch(`${API}${endpoint}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -54,7 +56,7 @@ const Auth = () => {
   const handleGoogleSuccess = async (credentialResponse: any) => {
     setLoading(true);
     try {
-      const response = await fetch(`https://dairy-farm-n2sj.onrender.com/api/auth/google`, {
+      const response = await fetch(`${API}/auth/google`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ credential: credentialResponse.credential }),

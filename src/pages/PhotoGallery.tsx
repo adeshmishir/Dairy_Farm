@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 import { Camera, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
+const API = (import.meta.env.VITE_API_URL as string) || 'http://localhost:5000/api';
+
 interface Photo {
   _id: string;
   url: string;
@@ -62,7 +64,7 @@ export default function PhotoGallery() {
   useEffect(() => {
     const fetchPhotos = async () => {
       try {
-        const response = await fetch('https://dairy-farm-n2sj.onrender.com/api/photos');
+        const response = await fetch(`${API}/photos`);
         if (!response.ok) throw new Error('Failed to fetch photos');
         const data = await response.json();
         setPhotos(data);
