@@ -1,12 +1,23 @@
 import { useState, useEffect, useRef } from 'react';
-import { Shield, Sparkles, ClipboardCheck, Heart, Star, Milk, Leaf, Handshake, ArrowRight, ChevronRight, X, MessageSquare } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
+import { ClipboardCheck, Heart, Star, Milk, Leaf, Handshake, ArrowRight, X, MessageSquare, Camera } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '../lib/auth';
 import { toast } from 'sonner';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 const API = 'http://localhost:5000/api';
+
+const MainStyles = () => (
+  <style>{`
+    @keyframes shine {
+      0% { left: -100%; }
+      100% { left: 100%; }
+    }
+    .animate-shine {
+      animation: shine 1.5s infinite;
+    }
+  `}</style>
+);
 
 
 
@@ -70,6 +81,7 @@ const AnimatedCounter = ({ end, suffix = "", duration = 2000 }: { end: number, s
 export default function Home() {
   const { user, token } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState<'milk' | 'feed'>('milk');
   const [selectedProduct, setSelectedProduct] = useState<any | null>(null);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
@@ -80,6 +92,41 @@ export default function Home() {
   const [milkProducts, setMilkProducts] = useState<any[]>([]);
   const [feedProducts, setFeedProducts] = useState<any[]>([]);
   const [loadingProducts, setLoadingProducts] = useState(true);
+
+  useEffect(() => {
+    const tab = searchParams.get('tab') as 'milk' | 'feed';
+    if (tab && (tab === 'milk' || tab === 'feed')) {
+      setActiveTab(tab);
+    }
+  }, [searchParams]);
+
+  useEffect(() => {
+    if (!loadingProducts) {
+      const item = searchParams.get('item');
+      if (item) {
+        const p = [...milkProducts, ...feedProducts].find(x => 
+          x.name.toLowerCase().replace(/\s+/g, '-') === item
+        );
+        if (p) setSelectedProduct(p);
+      }
+
+      const hash = window.location.hash.replace('#', '');
+      if (hash) {
+        const timer = setTimeout(() => {
+          const element = document.getElementById(hash);
+          if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        }, 300);
+        return () => clearTimeout(timer);
+      } else if (searchParams.get('tab')) {
+        const timer = setTimeout(() => {
+          productSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 300);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [loadingProducts, searchParams, milkProducts, feedProducts]);
 
   // Reviews
   const [reviews, setReviews] = useState<any[]>([]);
@@ -131,6 +178,42 @@ export default function Home() {
     }
   };
 
+  const [heroImage, setHeroImage] = useState('https://res.cloudinary.com/dfect5qyk/image/upload/v1773771949/mishra_dairy/hero/homepage_hero_2024.jpg');
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Fetch Hero Image from Settings
+  useEffect(() => {
+    fetch(`${API}/settings/homepage_hero`)
+      .then(r => r.json())
+      .then(data => {
+        if (data && data.value) setHeroImage(data.value);
+      })
+      .catch(() => {});
+  }, []);
+
+  const handleHeroChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('image', file);
+
+    const t = toast.loading('Uploading new hero image...');
+    try {
+      const res = await fetch(`${API}/settings/homepage_hero`, {
+        method: 'PUT',
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData,
+      });
+      if (!res.ok) throw new Error('Upload failed');
+      const data = await res.json();
+      setHeroImage(data.value);
+      toast.success('Hero image updated!', { id: t });
+    } catch (err) {
+      toast.error('Failed to update image', { id: t });
+    }
+  };
+
   const scrollToProducts = () => {
     productSectionRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -146,33 +229,32 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-[#02110b] text-green-50/90 font-sans selection:bg-green-500/30">
+      <MainStyles />
       <div className="pt-6"></div> {/* Spacer for floating nav */}
-      {/* Hero Section */}
-      <div className="relative bg-[#02110b] overflow-hidden border-b border-white/5">
-        <div className="absolute inset-0">
+      {/* ── Hero Section (Redesigned for Mobile Focus) ── */}
+      <div className="relative bg-gradient-to-br from-green-600 to-green-900 overflow-hidden border-b border-white/5 pt-10 lg:pt-0">
+        <div className="absolute inset-0 z-0">
           <img
             src="https://images.pexels.com/photos/248412/pexels-photo-248412.jpeg?auto=compress&cs=tinysrgb&w=1600"
             alt="Fresh Milk"
             className="w-full h-full object-cover opacity-20 scale-110"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#02110b]/80 to-[#02110b]"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-[#02110b]/40 via-transparent to-[#02110b]"></div>
         </div>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative pt-20 pb-24 lg:pt-32 lg:pb-32">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="text-center lg:text-left z-10">
-              <div className="inline-flex items-center mb-6 bg-green-500/10 text-green-400 px-4 py-2 rounded-full font-semibold border border-green-500/20 shadow-sm animate-fade-in-up">
-                <Sparkles className="w-5 h-5 mr-2 text-green-400" />
-                <span>Tested fresh every morning!</span>
-              </div>
-              <h1 className="text-5xl lg:text-7xl font-extrabold text-white mb-6 leading-tight tracking-tight">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 pt-16 pb-20 lg:pt-32 lg:pb-32">
+          <div className="flex flex-col lg:grid lg:grid-cols-2 gap-10 lg:gap-12 items-center">
+            {/* Upper Text Content */}
+            <div className="text-center lg:text-left space-y-6 lg:space-y-8">
+              <h1 className="text-4xl sm:text-5xl lg:text-7xl font-black text-white leading-[1.1] tracking-tighter">
                 Fresh milk from <br className="hidden lg:block"/>our farm
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-300 block mt-2">to your home.</span>
               </h1>
-              <p className="text-xl text-green-100/60 mb-10 leading-relaxed max-w-2xl mx-auto lg:mx-0 font-light">
+              <p className="text-lg sm:text-xl text-green-100/60 leading-relaxed max-w-2xl mx-auto lg:mx-0 font-medium">
                 Healthy cattle produce better milk. That's why we provide high-nutrition animal feed for our cows, and pure, safe milk for your family.
               </p>
-              <div className="flex flex-col sm:flex-row justify-center lg:justify-start gap-4">
+              {/* Desktop Only Button Placement */}
+              <div className="hidden lg:flex flex-row justify-start gap-4">
                 <button 
                   onClick={scrollToProducts}
                   className="bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-8 rounded-full shadow-lg hover:shadow-xl transition-all flex items-center justify-center transform hover:scale-105 active:scale-95"
@@ -183,15 +265,46 @@ export default function Home() {
               </div>
             </div>
             
-            <div className="relative hidden lg:block z-10">
-              <div className="absolute inset-0 bg-gradient-to-tr from-green-500 to-emerald-600 rounded-[3rem] transform rotate-3 scale-105 opacity-10 blur-2xl"></div>
-              <img 
-                src="https://res.cloudinary.com/dfect5qyk/image/upload/v1773771949/mishra_dairy/hero/homepage_hero_2024.jpg"
-                alt="Fresh Milk Pouring"
-                className="relative rounded-[3rem] shadow-2xl object-cover w-full h-[500px] border-4 border-white/10"
-              />
-             
+            {/* Visual Focus: Hero Image */}
+            <div className="w-full max-w-[500px] lg:max-w-none mx-auto lg:mx-0 order-2 lg:order-none relative group/hero">
+              <div className="absolute inset-0 bg-green-500 rounded-[2rem] sm:rounded-[3rem] rotate-3 opacity-20 blur-xl group-hover:rotate-6 transition-transform duration-700"></div>
+              <div className="relative rounded-[2rem] sm:rounded-[3rem] overflow-hidden shadow-[0_50px_100px_rgba(0,0,0,0.5)] border-4 border-white/20 transition-transform duration-500 group-hover:-translate-y-2">
+                <img 
+                  src={heroImage}
+                  alt="Fresh Milk Pouring"
+                  className="w-full h-[300px] sm:h-[450px] lg:h-[550px] object-cover transition-transform duration-[2s] group-hover:scale-105"
+                />
+                {user?.isAdmin && (
+                  <>
+                    <input 
+                      type="file" 
+                      className="hidden" 
+                      ref={fileInputRef} 
+                      onChange={handleHeroChange} 
+                      accept="image/*"
+                    />
+                    <button 
+                      onClick={() => fileInputRef.current?.click()}
+                      className="absolute top-6 right-6 z-20 bg-black/60 hover:bg-black/80 backdrop-blur-md p-4 rounded-full text-white opacity-0 group-hover/hero:opacity-100 transition-all duration-300 shadow-2xl border border-white/10"
+                    >
+                      <Camera className="w-6 h-6" />
+                    </button>
+                  </>
+                )}
+              </div>
             </div>
+
+            {/* Mobile Only Button Placement (Under Image) */}
+            <div className="flex lg:hidden order-3 w-full justify-center">
+              <button 
+                onClick={scrollToProducts}
+                className="w-full max-w-sm bg-green-600 hover:bg-green-700 text-white font-black py-5 rounded-2xl shadow-2xl shadow-green-900/40 flex items-center justify-center transform active:scale-95"
+              >
+                Explore Products
+                <ArrowRight className="ml-2 w-6 h-6" />
+              </button>
+            </div>
+
           </div>
         </div>
       </div>
@@ -199,11 +312,11 @@ export default function Home() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 -mt-10 relative z-20">
 
         {/* ── Products Section (Integrated) ── */}
-        <div ref={productSectionRef} className="py-16 scroll-mt-24">
-           <div className="text-center mb-12">
-              <h2 className="text-4xl md:text-5xl font-black text-white mb-4">Our Premium Offerings</h2>
-              <p className="text-xl text-green-100/60 max-w-2xl mx-auto">Crafted with care for health and purity.</p>
-              <div className="h-1.5 w-24 bg-green-500 mx-auto mt-6 rounded-full"></div>
+        <div ref={productSectionRef} className="py-8 sm:py-16 scroll-mt-24">
+           <div className="text-center mb-8 sm:mb-12">
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white mb-3 sm:mb-4">Our Premium Offerings</h2>
+              <p className="text-lg sm:text-xl text-green-100/60 max-w-2xl mx-auto px-4">Crafted with care for health and purity.</p>
+              <div className="h-1.5 w-16 sm:w-24 bg-green-500 mx-auto mt-4 sm:mt-6 rounded-full"></div>
            </div>
 
            {/* Modern Toggle Bar */}
@@ -242,7 +355,7 @@ export default function Home() {
             </div>
            </div>
 
-           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+           <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
             {activeTab === 'milk' ? (
               loadingProducts ? (
                 <div className="col-span-3 flex justify-center py-24">
@@ -255,51 +368,106 @@ export default function Home() {
                 </div>
               ) : (
                 milkProducts.map((product: any) => (
-                  <Card key={product._id} className="overflow-hidden bg-[#0a2318] hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 group border border-white/5 flex flex-col backdrop-blur-sm">
-                    <div className="relative h-64 overflow-hidden">
+                  <div 
+                    key={product._id} 
+                    id={product.name.toLowerCase().replace(/\s+/g, '-')}
+                    className="group relative flex flex-col bg-[#041a11]/40 backdrop-blur-md rounded-[1.5rem] sm:rounded-[2.5rem] border border-white/5 hover:border-green-500/20 transition-all duration-500 hover:shadow-[0_40px_100px_rgba(0,0,0,0.6)] overflow-hidden cursor-default hover:-translate-y-2 scroll-mt-32"
+                  >
+                    {/* Image Container */}
+                    <div className="relative h-40 sm:h-56 md:h-72 w-full overflow-hidden">
                       {product.image ? (
-                        <img src={product.image} alt={product.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                        <img 
+                          src={product.image} 
+                          alt={product.name} 
+                          className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" 
+                        />
                       ) : (
-                        <div className="w-full h-full bg-green-900/30 flex items-center justify-center">
-                          <Milk className="h-16 w-16 text-green-500/30" />
+                        <div className="w-full h-full bg-green-900/10 flex items-center justify-center">
+                          <Milk className="h-20 w-20 text-green-500/20" />
                         </div>
                       )}
-                      <div className="absolute top-4 right-4 backdrop-blur-md px-4 py-1.5 rounded-full text-sm font-bold text-white shadow-lg bg-green-600/80 border border-green-500">
-                        Farm Fresh
-                      </div>
-                      {product.price && (
-                        <div className="absolute bottom-4 left-4 bg-black/50 backdrop-blur-md px-3 py-1 rounded-full text-sm font-bold text-green-400 border border-green-500/20">
-                          {product.price}
-                        </div>
-                      )}
+                      {/* Gradient Overlay for Title Clarity */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#041a11] via-transparent to-transparent opacity-60" />
                     </div>
-                    <CardContent className="flex flex-col flex-1 pt-8">
-                      <h3 className="text-xl font-bold text-white group-hover:text-green-400 transition-colors mb-3">{product.name}</h3>
-                      <p className="text-green-100/50 leading-relaxed mb-6 flex-1">{product.description}</p>
-                      <Button onClick={() => setSelectedProduct(product)} variant="outline" className="w-full mt-auto rounded-xl group/btn transition-all font-bold border-green-500/20 text-green-400 hover:bg-green-500 hover:text-white">
-                        View Details <ChevronRight className="ml-1 h-4 w-4 transition-transform group-hover/btn:translate-x-1" />
-                      </Button>
-                    </CardContent>
-                  </Card>
+
+                    {/* Content */}
+                    <div className="flex flex-col flex-1 p-3 sm:p-5 md:p-8 pt-4 sm:pt-6">
+                      <div className="flex items-start justify-between gap-2 mb-2 sm:mb-4">
+                        <h3 className="text-sm sm:text-xl md:text-2xl font-black text-white group-hover:text-green-400 transition-colors leading-tight">
+                          {product.price && (
+                            <span className="inline-block mr-1 sm:mr-3 px-1.5 py-0.5 rounded-lg sm:rounded-xl bg-green-500/10 text-green-400 text-[10px] sm:text-sm font-black border border-green-500/20">
+                              {product.price}
+                            </span>
+                          )}
+                          <span className="block sm:inline mt-1 sm:mt-0">{product.name}</span>
+                        </h3>
+                      </div>
+
+                      <p className="text-green-50/40 text-[10px] sm:text-sm leading-relaxed mb-4 sm:mb-8 flex-1 font-medium line-clamp-2 sm:line-clamp-none">
+                        {product.description}
+                      </p>
+
+                      <button 
+                        onClick={() => setSelectedProduct(product)}
+                        className="w-full py-2.5 sm:py-4 rounded-xl sm:rounded-2xl bg-white/5 border border-white/10 text-white font-bold text-[10px] sm:text-sm tracking-wider uppercase flex items-center justify-center gap-1 sm:gap-2 hover:bg-green-600 hover:border-green-500 transition-all duration-300 group/btn"
+                      >
+                        Details
+                        <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 transition-transform group-hover/btn:translate-x-2" />
+                      </button>
+                    </div>
+
+                    {/* Subtle Shine Effect on hover */}
+                    <div className="absolute -inset-full h-full w-1/2 z-20 block transform -skew-x-12 bg-gradient-to-r from-transparent via-white opacity-5 group-hover:animate-shine pointer-events-none" />
+                  </div>
                 ))
               )
             ) : (
               feedProducts.map((product: any, index) => (
-                <Card key={index} className="overflow-hidden bg-[#0a2318] hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 group border border-white/5 flex flex-col backdrop-blur-sm">
-                  <div className="relative h-64 overflow-hidden">
-                    <img src={product.image} alt={product.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
-                    <div className="absolute top-4 right-4 backdrop-blur-md px-4 py-1.5 rounded-full text-sm font-bold text-white shadow-lg bg-orange-600/80 border border-orange-500">
-                      Premium Quality
-                    </div>
+                <div 
+                  key={index} 
+                  id={product.name.toLowerCase().replace(/\s+/g, '-')}
+                  className="group relative flex flex-col bg-[#041a11]/40 backdrop-blur-md rounded-[1.5rem] sm:rounded-[2.5rem] border border-white/5 hover:border-orange-500/20 transition-all duration-500 hover:shadow-[0_40px_100px_rgba(0,0,0,0.6)] overflow-hidden cursor-default hover:-translate-y-2 scroll-mt-32"
+                >
+                  {/* Image Container */}
+                  <div className="relative h-40 sm:h-56 md:h-72 w-full overflow-hidden">
+                    <img 
+                      src={product.image} 
+                      alt={product.name} 
+                      className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" 
+                    />
+                    {/* Gradient Overlay for Title Clarity */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#041a11] via-transparent to-transparent opacity-60" />
                   </div>
-                  <CardContent className="flex flex-col flex-1 pt-8">
-                    <h3 className="text-xl font-bold text-white group-hover:text-orange-400 transition-colors mb-3">{product.name}</h3>
-                    <p className="text-green-100/50 leading-relaxed mb-6 flex-1">{product.description}</p>
-                    <Button onClick={() => setSelectedProduct(product)} variant="outline" className="w-full mt-auto rounded-xl group/btn transition-all font-bold border-orange-500/20 text-orange-400 hover:bg-orange-500 hover:text-white">
-                      View Details <ChevronRight className="ml-1 h-4 w-4 transition-transform group-hover/btn:translate-x-1" />
-                    </Button>
-                  </CardContent>
-                </Card>
+
+                  {/* Content */}
+                  <div className="flex flex-col flex-1 p-3 sm:p-5 md:p-8 pt-4 sm:pt-6">
+                    <div className="flex items-start justify-between gap-2 mb-2 sm:mb-4">
+                      <h3 className="text-sm sm:text-xl md:text-2xl font-black text-white group-hover:text-orange-400 transition-colors leading-tight">
+                        {product.price && (
+                          <span className="inline-block mr-1 sm:mr-3 px-1.5 py-0.5 rounded-lg sm:rounded-xl bg-orange-500/10 text-orange-400 text-[10px] sm:text-sm font-black border border-orange-500/20">
+                            {product.price}
+                          </span>
+                        )}
+                        <span className="block sm:inline mt-1 sm:mt-0">{product.name}</span>
+                      </h3>
+                    </div>
+
+                    <p className="text-green-50/40 text-[10px] sm:text-sm leading-relaxed mb-4 sm:mb-8 flex-1 font-medium line-clamp-2 sm:line-clamp-none">
+                      {product.description}
+                    </p>
+
+                    <button 
+                      onClick={() => setSelectedProduct(product)}
+                      className="w-full py-2.5 sm:py-4 rounded-xl sm:rounded-2xl bg-white/5 border border-white/10 text-white font-bold text-[10px] sm:text-sm tracking-wider uppercase flex items-center justify-center gap-1 sm:gap-2 hover:bg-orange-600 hover:border-orange-500 transition-all duration-300 group/btn"
+                    >
+                      Details
+                      <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 transition-transform group-hover/btn:translate-x-2" />
+                    </button>
+                  </div>
+
+                  {/* Subtle Shine Effect on hover */}
+                  <div className="absolute -inset-full h-full w-1/2 z-20 block transform -skew-x-12 bg-gradient-to-r from-transparent via-white opacity-5 group-hover:animate-shine pointer-events-none" />
+                </div>
               ))
             )}
            </div>
@@ -307,68 +475,70 @@ export default function Home() {
 
 
         {/* ── Social Proof Stats Section ── */}
-        <div className="bg-[#0a2318] rounded-[3rem] p-10 shadow-2xl border border-white/5 mb-24">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 divide-x divide-transparent md:divide-white/5">
-            <div className="text-center md:px-4">
-              <div className="bg-green-500/10 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-green-500/10">
-                <Heart className="h-8 w-8 text-green-400" />
+        <div className="bg-[#0a2318] rounded-[1.5rem] sm:rounded-[3rem] p-6 sm:p-10 shadow-2xl border border-white/5 mb-16 sm:mb-24">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-8 divide-x divide-transparent md:divide-white/5">
+            <div className="text-center px-1 sm:px-4">
+              <div className="bg-green-500/10 w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4 border border-green-500/10">
+                <Heart className="h-6 w-6 sm:h-8 sm:w-8 text-green-400" />
               </div>
-              <h4 className="text-4xl lg:text-5xl font-black text-white mb-2">
+              <h4 className="text-2xl sm:text-4xl lg:text-5xl font-black text-white mb-1 sm:mb-2">
                 <AnimatedCounter end={50} suffix="+" />
               </h4>
-              <p className="text-green-400 font-bold tracking-widest uppercase text-xs">Healthy Cattle</p>
+              <p className="text-green-400 font-bold tracking-widest uppercase text-[10px] sm:text-xs">Healthy Cattle</p>
             </div>
-            <div className="text-center md:px-4">
-              <div className="bg-[#041a11] w-20 h-20 rounded-[1.5rem] flex items-center justify-center mx-auto mb-6 shadow-xl border border-white/5 transform -rotate-3 hover:rotate-0 transition-transform">
-                <Milk className="h-10 w-10 text-green-400" />
+            <div className="text-center px-1 sm:px-4">
+              <div className="bg-[#041a11] w-12 h-12 sm:w-20 sm:h-20 rounded-xl sm:rounded-[1.5rem] flex items-center justify-center mx-auto mb-3 sm:mb-6 shadow-xl border border-white/5 transform -rotate-3 hover:rotate-0 transition-transform">
+                <Milk className="h-6 w-6 sm:h-10 sm:w-10 text-green-400" />
               </div>
-              <h4 className="text-4xl lg:text-5xl font-black text-white mb-2">
+              <h4 className="text-2xl sm:text-4xl lg:text-5xl font-black text-white mb-1 sm:mb-2">
                 <AnimatedCounter end={200} suffix="+" />
               </h4>
-              <p className="text-green-400 font-bold tracking-widest uppercase text-xs">Litres Daily</p>
+              <p className="text-green-400 font-bold tracking-widest uppercase text-[10px] sm:text-xs">Litres Daily</p>
             </div>
-            <div className="text-center md:px-4">
-              <div className="bg-[#041a11] w-20 h-20 rounded-[1.5rem] flex items-center justify-center mx-auto mb-6 shadow-xl border border-white/5 transform rotate-3 hover:rotate-0 transition-transform">
-                <Leaf className="h-10 w-10 text-green-400" />
+            <div className="text-center px-1 sm:px-4">
+              <div className="bg-[#041a11] w-12 h-12 sm:w-20 sm:h-20 rounded-xl sm:rounded-[1.5rem] flex items-center justify-center mx-auto mb-3 sm:mb-6 shadow-xl border border-white/5 transform rotate-3 hover:rotate-0 transition-transform">
+                <Leaf className="h-6 w-6 sm:h-10 sm:w-10 text-green-400" />
               </div>
-              <h4 className="text-4xl lg:text-5xl font-black text-white mb-2">
+              <h4 className="text-2xl sm:text-4xl lg:text-5xl font-black text-white mb-1 sm:mb-2">
                 <AnimatedCounter end={10} suffix="+" />
               </h4>
-              <p className="text-green-400 font-bold tracking-widest uppercase text-xs">Feed Products</p>
+              <p className="text-green-400 font-bold tracking-widest uppercase text-[10px] sm:text-xs">Feed Products</p>
             </div>
-            <div className="text-center md:px-4">
-              <div className="bg-[#041a11] w-20 h-20 rounded-[1.5rem] flex items-center justify-center mx-auto mb-6 shadow-xl border border-white/5 transform -rotate-3 hover:rotate-0 transition-transform">
-                <Handshake className="h-10 w-10 text-green-400" />
+            <div className="text-center px-1 sm:px-4">
+              <div className="bg-[#041a11] w-12 h-12 sm:w-20 sm:h-20 rounded-xl sm:rounded-[1.5rem] flex items-center justify-center mx-auto mb-3 sm:mb-6 shadow-xl border border-white/5 transform -rotate-3 hover:rotate-0 transition-transform">
+                <Handshake className="h-6 w-6 sm:h-10 sm:w-10 text-green-400" />
               </div>
-              <h4 className="text-4xl lg:text-5xl font-black text-white mb-2">
+              <h4 className="text-2xl sm:text-4xl lg:text-5xl font-black text-white mb-1 sm:mb-2">
                 <AnimatedCounter end={100} suffix="+" />
               </h4>
-              <p className="text-green-400 font-bold tracking-widest uppercase text-xs">Happy Farmers</p>
+              <p className="text-green-400 font-bold tracking-widest uppercase text-[10px] sm:text-xs">Happy Farmers</p>
             </div>
           </div>
         </div>
-           {/* ── Testing Focus Section ── */}
-        <div className="bg-gradient-to-br from-green-600 to-emerald-900 rounded-[3rem] p-12 text-white mb-20 shadow-2xl relative overflow-hidden border border-white/10">
+        {/* ── Testing Focus Section ── */}
+        <div className="bg-gradient-to-br from-green-600 to-emerald-900 rounded-[2rem] sm:rounded-[3rem] p-8 sm:p-12 text-white mb-20 shadow-2xl relative overflow-hidden border border-white/10">
           <div className="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10"></div>
-          <div className="max-w-4xl mx-auto text-center relative z-10">
-            <ClipboardCheck className="h-16 w-16 mx-auto mb-6 opacity-90" />
-            <h2 className="text-4xl font-black mb-6">Why All The Fuss About Testing?</h2>
-            <p className="text-2xl mb-4 font-bold text-green-400">The simple answer is because 'We Care'</p>
-            <div className="h-1 w-24 bg-white mx-auto my-8 opacity-20"></div>
-            <p className="text-xl leading-relaxed text-green-50/80">
+          <div className="max-w-4xl mx-auto text-center relative z-10 px-4">
+            <ClipboardCheck className="h-12 w-12 sm:h-16 sm:w-16 mx-auto mb-6 opacity-90" />
+            <h2 className="text-3xl sm:text-4xl font-black mb-6 leading-tight">Why All The Fuss About Testing?</h2>
+            <p className="text-xl sm:text-2xl mb-4 font-bold text-green-400">The simple answer is because 'We Care'</p>
+            <div className="h-1 w-20 sm:w-24 bg-white mx-auto my-6 sm:my-8 opacity-20"></div>
+            <p className="text-lg sm:text-xl leading-relaxed text-green-50/80">
               We don't just say it, <span className="font-black text-white underline decoration-green-400 underline-offset-8">We prove it.</span>
               <br className="mt-4" /> Every batch tested. Every packet pure.
-              <br /> Check your daily milk report.
+            </p>
+            <p className="text-base sm:text-lg mt-6 opacity-60 font-black uppercase tracking-widest">
+              Check your daily milk report.
             </p>
           </div>
         </div>
 
         {/* Customer Reviews Section */}
-        <div className="mt-32 mb-20 text-center">
-          <div className="mb-12">
-            <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-4">What Our Customers Say</h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">Your feedback keeps us growing and improving every day.</p>
-            <div className="h-1.5 w-24 bg-green-600 mx-auto mt-6 rounded-full"></div>
+        <div className="mt-20 sm:mt-32 mb-12 sm:mb-20 text-center px-4">
+          <div className="mb-8 sm:mb-12">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white mb-3 sm:mb-4">What Our Customers Say</h2>
+            <p className="text-lg sm:text-xl text-green-100/60 max-w-2xl mx-auto text-center px-4">Your feedback keeps us growing and improving every day.</p>
+            <div className="h-1.5 w-16 sm:w-24 bg-green-600 mx-auto mt-4 sm:mt-6 rounded-full"></div>
           </div>
 
           <div className="flex flex-col sm:flex-row justify-center items-center gap-6 mb-16">
@@ -449,8 +619,8 @@ export default function Home() {
 
       {/* Product Detail Modal */}
       {selectedProduct && (
-        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-300" onClick={() => setSelectedProduct(null)}>
-          <div className="bg-[#0a2318] rounded-[2.5rem] max-w-2xl w-full max-h-[90vh] overflow-y-auto relative shadow-2xl animate-in zoom-in-95 duration-300 border border-white/10" onClick={e => e.stopPropagation()}>
+        <div className="fixed inset-0 z-[110] flex items-center justify-center p-2 sm:p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-300" onClick={() => setSelectedProduct(null)}>
+          <div className="bg-[#0a2318] rounded-[1.5rem] sm:rounded-[2.5rem] max-w-2xl w-full max-h-[95vh] overflow-y-auto relative shadow-2xl animate-in zoom-in-95 duration-300 border border-white/10" onClick={e => e.stopPropagation()}>
             <button
               onClick={() => setSelectedProduct(null)}
               className="absolute top-5 right-5 z-10 p-2 text-green-100/50 hover:text-white bg-white/5 hover:bg-white/10 rounded-full transition-all"
@@ -531,8 +701,8 @@ export default function Home() {
 
       {/* Review Modal */}
       {isReviewModalOpen && (
-        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-300">
-          <div className="bg-[#0a2318] rounded-[2.5rem] max-w-lg w-full p-10 relative shadow-2xl animate-in zoom-in-95 duration-300 border border-white/10">
+        <div className="fixed inset-0 z-[110] flex items-center justify-center p-2 sm:p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-300">
+          <div className="bg-[#0a2318] rounded-[1.5rem] sm:rounded-[2.5rem] max-w-lg w-full p-6 sm:p-10 relative shadow-2xl animate-in zoom-in-95 duration-300 border border-white/10">
             <button 
               onClick={() => setIsReviewModalOpen(false)}
               className="absolute top-6 right-6 p-2 text-green-100/50 hover:text-white bg-white/5 rounded-full transition-colors"

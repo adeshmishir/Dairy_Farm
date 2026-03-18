@@ -110,7 +110,6 @@ const Admin = () => {
 
       const targetId = editingProductId ? editingProductId.split(':')[0] : '';
       const url = `${API}/products${targetId ? `/${targetId}` : ''}`;
-      console.log(`[Admin] Fetching ${editingProductId ? 'PUT' : 'POST'} to ${url}`);
       
       const res = await fetch(url, {
         method: editingProductId ? 'PUT' : 'POST',
@@ -160,7 +159,6 @@ const Admin = () => {
       fd.append('category', photoCategory);
       const targetId = editingPhotoId ? editingPhotoId.split(':')[0] : '';
       const url = `${API}/photos${targetId ? `/${targetId}` : ''}`;
-      console.log(`[Admin] Fetching Photo ${editingPhotoId ? 'PUT' : 'POST'} to ${url}`);
       
       const res = await fetch(url, {
         method: editingPhotoId ? 'PUT' : 'POST',
@@ -233,9 +231,9 @@ const Admin = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
 
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-black text-white mb-1">Admin Dashboard</h1>
-          <p className="text-green-100/40 font-medium tracking-tight">Manage your products, gallery and customer reviews</p>
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-3xl sm:text-4xl font-black text-white mb-1">Admin Dashboard</h1>
+          <p className="text-green-100/40 text-xs sm:text-sm font-medium tracking-tight">Manage products, photos and reviews</p>
         </div>
 
         {/* Tab Bar */}
@@ -263,7 +261,7 @@ const Admin = () => {
 
         {/* ── Products List ── */}
         {activeTab === 'products' && (
-          <div className="bg-[#0a2318] rounded-3xl shadow-xl border border-white/10 p-8">
+          <div className="bg-[#0a2318] rounded-[1.5rem] sm:rounded-3xl shadow-xl border border-white/10 p-4 sm:p-8">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-black text-white flex items-center gap-2">
                 <Package className="text-green-400" /> All Products
@@ -280,8 +278,9 @@ const Admin = () => {
                 <p className="font-bold">No products yet. Add one!</p>
               </div>
             ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full">
+              <div>
+                {/* Desktop Table View */}
+                <table className="hidden sm:table w-full">
                   <thead>
                     <tr className="border-b border-white/5">
                       <th className="text-left py-3 px-4 text-xs font-black text-green-500/40 uppercase tracking-wider">Product</th>
@@ -326,6 +325,44 @@ const Admin = () => {
                     ))}
                   </tbody>
                 </table>
+
+                {/* Mobile Card View */}
+                <div className="block sm:hidden space-y-4">
+                  {products.map(p => (
+                    <div key={p._id} className="bg-white/5 rounded-2xl p-4 border border-white/5 space-y-4">
+                      <div className="flex items-center gap-4">
+                        {p.image && <img src={p.image} alt={p.name} className="h-14 w-14 rounded-xl object-cover border border-white/10 flex-shrink-0" />}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex justify-between items-start gap-2">
+                            <h3 className="font-bold text-white text-sm truncate">{p.name}</h3>
+                            <span className="text-green-400 font-black text-xs whitespace-nowrap">{p.price}</span>
+                          </div>
+                          <p className="text-[10px] text-green-100/40 line-clamp-1 mt-0.5">{p.description}</p>
+                          <div className="mt-2 text-left">
+                            <span className={`px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest ${
+                              p.category === 'milk' ? 'bg-blue-500/10 text-blue-400' : 'bg-orange-500/10 text-orange-400'
+                            }`}>{p.category}</span>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="flex gap-2 pt-2 border-t border-white/5">
+                        <button 
+                          onClick={() => handleEditProductClick(p)}
+                          className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-green-500/10 text-green-400 rounded-xl text-xs font-bold transition-all active:scale-95"
+                        >
+                          <Pencil size={14} /> Edit
+                        </button>
+                        <button
+                          onClick={() => handleDeleteProduct(p._id, p.name)}
+                          className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-red-500/10 text-red-400 rounded-xl text-xs font-bold transition-all active:scale-95"
+                        >
+                          <Trash2 size={14} /> Delete
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
           </div>
@@ -522,7 +559,7 @@ const Admin = () => {
 
         {/* ── Reviews ── */}
         {activeTab === 'reviews' && (
-          <div className="bg-[#0a2318] rounded-3xl shadow-xl border border-white/10 p-8">
+          <div className="bg-[#0a2318] rounded-[1.5rem] sm:rounded-3xl shadow-xl border border-white/10 p-4 sm:p-8">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-black text-white flex items-center gap-2">
                 <MessageSquare className="text-green-400" /> Customer Reviews ({reviews.length})
@@ -531,6 +568,7 @@ const Admin = () => {
                 <RefreshCw size={18} />
               </button>
             </div>
+
             {loadingReviews ? (
               <div className="flex justify-center py-16"><Loader2 className="animate-spin h-8 w-8 text-green-600" /></div>
             ) : reviews.length === 0 ? (
@@ -541,43 +579,47 @@ const Admin = () => {
             ) : (
               <div className="space-y-4">
                 {/* Average rating summary */}
-                <div className="bg-green-500/10 rounded-2xl p-5 flex items-center gap-6 mb-6 border border-white/5">
+                <div className="bg-green-500/10 rounded-2xl p-5 flex flex-col sm:flex-row items-center gap-4 sm:gap-6 mb-6 border border-white/5">
                   <div className="text-center">
-                    <p className="text-5xl font-black text-green-400">
-                      {(reviews.reduce((a, r) => a + r.rating, 0) / reviews.length).toFixed(1)}
+                    <p className="text-4xl sm:text-5xl font-black text-green-400">
+                      {reviews.length > 0 ? (reviews.reduce((a, r) => a + r.rating, 0) / reviews.length).toFixed(1) : '0.0'}
                     </p>
-                    <p className="text-xs font-bold text-green-500/60 mt-1 uppercase tracking-widest">Average Rating</p>
+                    <p className="text-[10px] sm:text-xs font-bold text-green-500/60 mt-1 uppercase tracking-widest">Average Rating</p>
                   </div>
                   <div className="flex gap-1">
                     {[1,2,3,4,5].map(s => (
-                      <Star key={s} className={`h-6 w-6 ${s <= Math.round(reviews.reduce((a,r)=>a+r.rating,0)/reviews.length) ? 'text-yellow-400 fill-current' : 'text-white/10'}`} />
+                      <Star key={s} className={`h-5 w-5 sm:h-6 sm:w-6 ${s <= Math.round(reviews.length > 0 ? reviews.reduce((a,r)=>a+r.rating,0)/reviews.length : 0) ? 'text-yellow-400 fill-current' : 'text-white/10'}`} />
                     ))}
                   </div>
-                  <p className="text-sm text-green-100/40 font-medium">{reviews.length} reviews total</p>
+                  <p className="text-xs sm:text-sm text-green-100/40 font-medium">{reviews.length} reviews total</p>
                 </div>
 
                 {reviews.map(r => (
-                  <div key={r._id} className="flex justify-between items-start p-5 border border-white/5 rounded-2xl hover:bg-white/5 transition-colors">
-                    <div className="flex-1">
+                  <div key={r._id} className="flex flex-col sm:flex-row justify-between items-start gap-4 p-4 sm:p-5 border border-white/5 rounded-2xl hover:bg-white/5 transition-colors group">
+                    <div className="flex-1 w-full">
                       <div className="flex items-center gap-3 mb-2">
-                        <div className="h-9 w-9 bg-green-500/20 rounded-xl flex items-center justify-center text-green-400 font-black text-sm uppercase">
+                        <div className="h-8 w-8 sm:h-9 sm:w-9 bg-green-500/20 rounded-xl flex items-center justify-center text-green-400 font-black text-xs sm:text-sm uppercase">
                           {r.name.charAt(0)}
                         </div>
-                        <div>
-                          <p className="font-bold text-white">{r.name}</p>
-                          <p className="text-xs text-green-100/40">{r.date}</p>
+                        <div className="flex-1">
+                          <p className="font-bold text-white text-sm sm:text-base">{r.name}</p>
+                          <p className="text-[10px] sm:text-xs text-green-100/40">{r.date}</p>
                         </div>
-                        <div className="flex ml-2">
+                        <div className="flex gap-0.5">
                           {[1,2,3,4,5].map(s => (
-                            <Star key={s} className={`h-4 w-4 ${s <= r.rating ? 'text-yellow-400 fill-current' : 'text-white/10'}`} />
+                            <Star key={s} className={`h-3 w-3 sm:h-4 sm:w-4 ${s <= r.rating ? 'text-yellow-400 fill-current' : 'text-white/10'}`} />
                           ))}
                         </div>
+                        <button
+                          onClick={() => handleDeleteReview(r._id)}
+                          className="sm:hidden p-2 text-red-400 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all"
+                        ><Trash2 size={16} /></button>
                       </div>
-                      <p className="text-green-100/70 italic text-sm">"{r.comment}"</p>
+                      <p className="text-green-100/70 italic text-xs sm:text-sm leading-relaxed">"{r.comment}"</p>
                     </div>
                     <button
                       onClick={() => handleDeleteReview(r._id)}
-                      className="ml-4 p-2 text-red-400 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all flex-shrink-0"
+                      className="hidden sm:block p-2 text-red-400 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all flex-shrink-0"
                     ><Trash2 size={18} /></button>
                   </div>
                 ))}

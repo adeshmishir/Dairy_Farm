@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import { AuthProvider } from './lib/auth';
 import { GoogleOAuthProvider } from '@react-oauth/google';
@@ -10,12 +10,24 @@ import PhotoGallery from './pages/PhotoGallery';
 import Auth from './pages/Auth';
 import Admin from './pages/Admin';
 import Landing from './pages/Landing';
+import { useEffect } from 'react';
 
-const isFirstVisit = !localStorage.getItem('hasVisited');
+// Scroll to top on every route change
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  return null;
+}
+
+// Check if it's the first visit to show the landing page
+const getIsFirstVisit = () => !localStorage.getItem('hasVisited');
 
 function App() {
   return (
     <Router>
+      <ScrollToTop />
       <GoogleOAuthProvider clientId="1073775678759-fofaj6715du6pbc8o98vt0sct8o5r5b6.apps.googleusercontent.com">
         <AuthProvider>
           <Routes>
@@ -32,7 +44,7 @@ function App() {
                     <Routes>
                       <Route
                         path="/"
-                        element={isFirstVisit ? <Navigate to="/landing" replace /> : <Home />}
+                        element={getIsFirstVisit() ? <Navigate to="/landing" replace /> : <Home />}
                       />
                       <Route path="/about" element={<About />} />
                       <Route path="/gallery" element={<PhotoGallery />} />

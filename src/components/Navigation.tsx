@@ -36,8 +36,8 @@ export default function Navigation() {
         <div className="flex justify-between items-center h-14">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-3 group z-50">
-            <div className="bg-green-500/10 rounded-full p-1 overflow-hidden h-14 w-14 flex items-center justify-center border-2 border-green-500/20 group-hover:border-green-400 transition-all duration-300 shadow-sm backdrop-blur-sm">
-              <img src="/logo.png" alt="Mishra Dairy Farm Logo" className="h-full w-full object-contain" />
+            <div className="h-14 w-14 flex items-center justify-center transition-all duration-300 transform group-hover:scale-110 rounded-full overflow-hidden">
+              <img src="/logo.png" alt="Mishra Dairy Farm Logo" className="h-full w-full object-contain filter drop-shadow-md" />
             </div>
             <div>
             <h1 className="text-lg md:text-xl font-bold text-white group-hover:text-green-400 transition-colors">Mishra Dairy Farm</h1>
@@ -134,12 +134,6 @@ export default function Navigation() {
               </div>
             </div>
 
-            {/* Desktop WhatsApp icon button */}
-            <Button variant="whatsapp" className="ml-4 h-11 w-11 p-0 rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform" asChild title="WhatsApp">
-              <a href="https://wa.me/918953280445" target="_blank" rel="noopener noreferrer">
-                <WhatsAppSVG />
-              </a>
-            </Button>
           </div>
 
           {/* Mobile: Sheet Sidebar */}
@@ -155,8 +149,8 @@ export default function Navigation() {
                 <div className="p-6 flex flex-col h-full">
                 <SheetHeader className="mb-8 p-0 text-left">
                   <div className="flex items-center space-x-3">
-                    <div className="bg-green-500/10 rounded-full p-1 h-12 w-12 flex-shrink-0 border border-green-500/20 flex items-center justify-center backdrop-blur-sm">
-                      <img src="/logo.png" alt="Logo" className="h-full w-full object-contain" />
+                    <div className="h-12 w-12 flex-shrink-0 flex items-center justify-center rounded-full overflow-hidden">
+                      <img src="/logo.png" alt="Logo" className="h-full w-full object-contain filter drop-shadow-sm" />
                     </div>
                     <div>
                       <SheetTitle className="text-white text-lg font-bold">Mishra Dairy Farm</SheetTitle>

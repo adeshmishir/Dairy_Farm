@@ -37,7 +37,7 @@ function GalleryCard({ image, index }: { image: Photo; index: number }) {
         transform: 'translateY(40px)',
         transition: `opacity 0.6s ease-out ${index % 10 * 80}ms, transform 0.6s ease-out ${index % 10 * 80}ms`
       }}
-      className="group relative rounded-3xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-500 bg-[#0a2318] border border-white/5 cursor-pointer aspect-square"
+      className="group relative rounded-2xl sm:rounded-3xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-500 bg-[#0a2318] border border-white/5 cursor-pointer aspect-square"
     >
       <img
         src={image.url}
@@ -45,11 +45,11 @@ function GalleryCard({ image, index }: { image: Photo; index: number }) {
         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
       />
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-      <div className="absolute bottom-0 left-0 right-0 p-6 transform translate-y-6 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300">
-        <span className="inline-block px-3 py-1 bg-green-600 text-white text-xs font-bold uppercase tracking-wider rounded-full mb-2">
+      <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-6 transform translate-y-6 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300">
+        <span className="inline-block px-2 py-0.5 sm:px-3 sm:py-1 bg-green-600 text-white text-[10px] sm:text-xs font-bold uppercase tracking-wider rounded-full mb-1 sm:mb-2">
           {image.category || 'Farm Life'}
         </span>
-        <h3 className="text-xl font-bold text-white">{image.caption}</h3>
+        <h3 className="text-sm sm:text-xl font-bold text-white line-clamp-1 sm:line-clamp-none">{image.caption}</h3>
       </div>
     </div>
   );
@@ -105,7 +105,7 @@ export default function PhotoGallery() {
             <p className="text-green-100/30 text-xl font-black uppercase tracking-widest">No photos found in gallery</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-8">
             {photos.map((photo, index) => (
               <GalleryCard key={photo._id} image={photo} index={index} />
             ))}

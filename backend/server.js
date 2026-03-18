@@ -121,6 +121,13 @@ const reviewSchema = new mongoose.Schema({
 });
 const Review = mongoose.model('Review', reviewSchema);
 
+const settingsSchema = new mongoose.Schema({
+  key:      { type: String, required: true, unique: true },
+  value:    { type: String, required: true },
+  publicId: { type: String, default: '' },
+});
+const Settings = mongoose.model('Settings', settingsSchema);
+
 // ── Auth Routes ───────────────────────────────────────────────────────────────
 app.post('/api/auth/signup', async (req, res) => {
   try {
@@ -333,6 +340,41 @@ app.delete('/api/reviews/:id', auth, async (req, res) => {
     await Review.findByIdAndDelete(req.params.id);
     res.json({ message: 'Review deleted' });
   } catch { res.status(500).json({ message: 'Error deleting review' }); }
+});
+
+// ── Settings ──────────────────────────────────────────────────────────────────
+app.get('/api/settings/:key', async (req, res) => {
+  try {
+    const s = await Settings.findOne({ key: req.params.key });
+    res.json(s || { key: req.params.key, value: '' });
+  } catch { res.status(500).json({ message: 'Error' }); }
+});
+
+app.put('/api/settings/:key', auth, upload.single('image'), async (req, res) => {
+  if (!req.isAdmin) return res.status(403).json({ message: 'Admins only' });
+  try {
+    let value = req.body.value;
+    let publicId = '';
+    
+    if (req.file) {
+      const old = await Settings.findOne({ key: req.params.key });
+      if (old && old.publicId) await cloudinary.uploader.destroy(old.publicId);
+      
+      const resC = await uploadToCloudinary(req.file.buffer, 'mishra_dairy/settings');
+      value = resC.url;
+      publicId = resC.publicId;
+    }
+    
+    const s = await Settings.findOneAndUpdate(
+      { key: req.params.key },
+      { value, publicId },
+      { upsert: true, new: true }
+    );
+    res.json(s);
+  } catch (err) {
+    console.error('Settings update error:', err);
+    res.status(500).json({ message: 'Failed to update setting' });
+  }
 });
 
 // ── Health ────────────────────────────────────────────────────────────────────

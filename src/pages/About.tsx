@@ -1,7 +1,11 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Globe, Heart, ChevronDown, ChevronUp, Users, Sprout, Recycle, Calendar, MapPin, Clock, ArrowRight, CheckCircle } from 'lucide-react';
+import { Globe, Heart, ChevronDown, ChevronUp, Users, Sprout, Recycle, Calendar, MapPin, Clock, ArrowRight, CheckCircle, Camera, Edit3 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '../lib/auth';
+import { toast } from 'sonner';
+
+const API = 'http://localhost:5000/api';
 
 // Custom hook for scroll-triggered animations
 function useScrollAnimation() {
@@ -66,7 +70,82 @@ const AccordionItem = ({ title, icon: Icon, children, isOpen, onClick }: any) =>
 
 export default function About() {
   const navigate = useNavigate();
+  const { user, token } = useAuth();
   const [openSection, setOpenSection] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  const [founderImage, setFounderImage] = useState('https://res.cloudinary.com/dfect5qyk/image/upload/v1773684235/mishra_dairy_farm/founder.png');
+  const [founderName, setFounderName] = useState('Mr Suneel Mishra');
+  const [isUploading, setIsUploading] = useState(false);
+
+  useEffect(() => {
+    // Fetch image
+    fetch(`${API}/settings/founder_image`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.value) setFounderImage(data.value);
+      })
+      .catch(() => {});
+
+    // Fetch name
+    fetch(`${API}/settings/founder_name`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.value) setFounderName(data.value);
+      })
+      .catch(() => {});
+  }, []);
+
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !token) return;
+
+    setIsUploading(true);
+    const formData = new FormData();
+    formData.append('image', file);
+
+    try {
+      const res = await fetch(`${API}/settings/founder_image`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        body: formData
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+
+      setFounderImage(data.value);
+      toast.success('Founder image updated! 📸');
+    } catch (err: any) {
+      toast.error('Failed to update image: ' + err.message);
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleNameEdit = async () => {
+    const newName = prompt('Enter new Founder name:', founderName);
+    if (!newName || newName === founderName || !token) return;
+
+    try {
+      const res = await fetch(`${API}/settings/founder_name`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ value: newName })
+      });
+
+      if (!res.ok) throw new Error('Failed to update');
+      setFounderName(newName);
+      toast.success('Founder name updated! ✨');
+    } catch (err) {
+      toast.error('Could not update name');
+    }
+  };
 
   const toggleSection = (section: string) => {
     setOpenSection(openSection === section ? null : section);
@@ -90,12 +169,12 @@ export default function About() {
       `}</style>
 
       {/* Hero Header */}
-      <div className="bg-gradient-to-br from-green-600 to-green-800 pt-24 pb-48 text-white relative overflow-hidden">
+      <div className="bg-gradient-to-br from-green-600 to-green-800 pt-20 pb-40 sm:pt-24 sm:pb-48 text-white relative overflow-hidden">
         <div className="absolute inset-0 opacity-20 bg-[url('https://res.cloudinary.com/dfect5qyk/image/upload/v1773772540/mishra_dairy/about/about_hero_background.jpg')] bg-cover bg-center transition-opacity duration-700"></div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
           <AnimatedSection>
-            <h1 className="text-5xl md:text-7xl font-black mb-6 tracking-tight">Our Legacy & Care</h1>
-            <p className="text-xl md:text-2xl opacity-90 max-w-3xl mx-auto font-light leading-relaxed">
+            <h1 className="text-4xl sm:text-5xl md:text-7xl font-black mb-6 tracking-tight leading-tight">Our Legacy & Care</h1>
+            <p className="text-lg sm:text-xl md:text-2xl opacity-90 max-w-3xl mx-auto font-light leading-relaxed">
               Mishra Dairy Farm isn't just a business; it's a commitment to purity, farmers, and the health of our community.
             </p>
           </AnimatedSection>
@@ -106,23 +185,58 @@ export default function About() {
         
         {/* ── Founder Spotlight (MAIN FOCUS) ── */}
         <AnimatedSection className="mb-12 shadow-2xl">
-          <div className="bg-[#0a2318] rounded-[2.5rem] p-8 md:p-14 shadow-2xl border border-white/5 relative overflow-hidden group">
+          <div className="bg-[#0a2318] rounded-[2rem] sm:rounded-[2.5rem] p-6 sm:p-10 md:p-14 shadow-2xl border border-white/5 relative overflow-hidden group">
             <div className="absolute top-0 right-0 w-64 h-64 bg-green-500/5 opacity-50 rounded-full blur-3xl translate-x-1/2 -translate-y-1/2"></div>
             
-            <div className="flex flex-col md:flex-row gap-12 items-center relative z-10">
-              <div className="w-64 h-64 md:w-80 md:h-80 flex-shrink-0 relative">
-                <div className="absolute inset-0 bg-green-600 rounded-[2.5rem] rotate-6 group-hover:rotate-3 transition-transform duration-500"></div>
-                <img
-                  src="https://res.cloudinary.com/dfect5qyk/image/upload/v1773684235/mishra_dairy_farm/founder.png"
-                  alt="Suneel Mishra - Founder"
-                  className="w-full h-full object-cover rounded-[2.5rem] shadow-xl relative z-10 border-4 border-white transition-transform duration-500 group-hover:-translate-y-2"
-                />
+            <div className="flex flex-col md:flex-row gap-8 sm:gap-12 items-center relative z-10">
+              <div className="w-56 h-56 sm:w-64 sm:h-64 md:w-80 md:h-80 flex-shrink-0 relative">
+                <div className="absolute inset-0 bg-green-600 rounded-[2rem] sm:rounded-[2.5rem] rotate-6 group-hover:rotate-3 transition-transform duration-500"></div>
+                <div className="relative w-full h-full rounded-[2rem] sm:rounded-[2.5rem] overflow-hidden shadow-xl z-10 border-4 border-white transition-transform duration-500 group-hover:-translate-y-2">
+                  <img
+                    src={founderImage}
+                    alt="Suneel Mishra - Founder"
+                    className={`w-full h-full object-cover transition-all duration-500 ${isUploading ? 'blur-sm grayscale' : ''}`}
+                  />
+                  {user?.isAdmin && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button 
+                        onClick={() => fileInputRef.current?.click()}
+                        className="bg-green-600 p-4 rounded-full text-white shadow-xl transform active:scale-95 transition-transform"
+                        disabled={isUploading}
+                      >
+                        <Camera size={32} />
+                      </button>
+                      <input 
+                        type="file" 
+                        ref={fileInputRef} 
+                        className="hidden" 
+                        onChange={handleImageChange} 
+                        accept="image/*"
+                      />
+                    </div>
+                  )}
+                  {isUploading && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+                      <div className="w-12 h-12 border-4 border-green-500 border-t-transparent rounded-full animate-spin"></div>
+                    </div>
+                  )}
+                </div>
               </div>
               <div className="flex-1 text-center md:text-left">
                 <div className="inline-block bg-green-500/10 text-green-400 font-black text-xs uppercase tracking-widest px-4 py-1.5 rounded-full mb-4 border border-green-500/10">
                   Visionary Behind the Farm
                 </div>
-                <h2 className="text-4xl md:text-5xl font-black text-white mb-2 leading-tight">Mr. Suneel Mishra</h2>
+                <div className="flex flex-col md:flex-row items-center md:items-end gap-4 mb-2">
+                  <h2 className="text-4xl md:text-5xl font-black text-white leading-tight">{founderName}</h2>
+                  {user?.isAdmin && (
+                    <button 
+                      onClick={handleNameEdit}
+                      className="p-2 mb-1.5 bg-green-500/10 text-green-400 rounded-lg hover:bg-green-600 hover:text-white transition-all shadow-lg shadow-green-900/10"
+                    >
+                      <Edit3 size={18} />
+                    </button>
+                  )}
+                </div>
                 <p className="text-xl text-green-400 font-bold mb-6">Founder & Managing Director</p>
                 <div className="h-1 w-20 bg-green-500/20 mb-8 mx-auto md:mx-0"></div>
                 
