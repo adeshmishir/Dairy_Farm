@@ -27,7 +27,7 @@ const Auth = () => {
       const endpoint = isLogin ? '/auth/login' : '/auth/signup';
       const body = isLogin ? { email, password } : { name, email, password };
       
-      const response = await fetch(`http://localhost:5000/api${endpoint}`, {
+      const response = await fetch(`https://dairy-farm-n2sj.onrender.com/api${endpoint}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -54,7 +54,7 @@ const Auth = () => {
   const handleGoogleSuccess = async (credentialResponse: any) => {
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:5000/api/auth/google`, {
+      const response = await fetch(`https://dairy-farm-n2sj.onrender.com/api/auth/google`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ credential: credentialResponse.credential }),

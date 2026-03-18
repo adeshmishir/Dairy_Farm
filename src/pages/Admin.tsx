@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-const API = 'http://localhost:5000/api';
+const API = 'https://dairy-farm-n2sj.onrender.com/api';
 
 type Tab = 'products' | 'add-product' | 'photos' | 'reviews';
 

@@ -62,7 +62,7 @@ export default function PhotoGallery() {
   useEffect(() => {
     const fetchPhotos = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/photos');
+        const response = await fetch('https://dairy-farm-n2sj.onrender.com/api/photos');
         if (!response.ok) throw new Error('Failed to fetch photos');
         const data = await response.json();
         setPhotos(data);

@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '../lib/auth';
 import { toast } from 'sonner';
 
-const API = 'http://localhost:5000/api';
+const API = 'https://dairy-farm-n2sj.onrender.com/api';
 
 // Custom hook for scroll-triggered animations
 function useScrollAnimation() {

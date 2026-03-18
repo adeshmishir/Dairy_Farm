@@ -5,7 +5,7 @@ import { useAuth } from '../lib/auth';
 import { toast } from 'sonner';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
-const API = 'http://localhost:5000/api';
+const API = 'https://dairy-farm-n2sj.onrender.com/api';
 
 const MainStyles = () => (
   <style>{`
