@@ -50,7 +50,7 @@ export default function Landing() {
     <div className="min-h-screen bg-[#02110b] flex flex-col overflow-x-hidden relative selection:bg-green-500/30">
       {/* ── BACKGROUND LAYER ── */}
       <div 
-        className="fixed inset-0 z-0 scale-105 animate-pulse-slow"
+        className="fixed inset-0 z-0 scale-105"
         style={{
           backgroundImage: 'url(/landing-bg.png)',
           backgroundSize: 'cover',
@@ -60,7 +60,6 @@ export default function Landing() {
       />
       <div className="fixed inset-0 z-0 bg-gradient-to-b from-[#02110b]/90 via-[#02110b]/40 to-[#02110b] pointer-events-none" />
       
-      {/* Custom Keyframes for the zoom effect */}
       <style>{`
         @keyframes slowZoom {
           from { transform: scale(1); }
@@ -76,8 +75,11 @@ export default function Landing() {
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[700px] rounded-full bg-green-500/20 blur-[120px] pointer-events-none opacity-50" />
           
           {/* Logo */}
-          <div className="land-anim relative mb-10">
-            <div className="w-40 h-40 mx-auto transition-transform duration-500 hover:scale-110 flex items-center justify-center rounded-full overflow-hidden">
+          <div 
+            onClick={handleExplore}
+            className="land-anim relative mb-10 cursor-pointer group/logo"
+          >
+            <div className="w-40 h-40 mx-auto transition-all duration-500 group-hover/logo:scale-110 group-hover/logo:rotate-3 flex items-center justify-center rounded-full overflow-hidden">
               <img
                 src="/logo.png"
                 alt="Mishra Dairy Farm"
@@ -88,29 +90,42 @@ export default function Landing() {
             <span className="absolute inset-0 rounded-full border border-green-400/20 animate-[ping_3s_infinite] scale-150" />
           </div>
 
-          {/* Stylish Name as CTA */}
-          <div 
-            onClick={handleExplore}
-            className="land-anim group cursor-pointer select-none relative"
-          >
-            <h1 className="text-6xl sm:text-8xl md:text-[11rem] font-black tracking-tighter transition-all duration-1000 flex flex-col items-center">
-              <span className="block leading-none -mb-6 text-[#fdfcf0]/50 group-hover:text-white group-hover:drop-shadow-[0_0_20px_rgba(255,255,255,0.3)] group-hover:-translate-y-4 transition-all duration-1000 ease-out italic font-serif mix-blend-overlay filter brightness-110">
-                Mishra
-              </span>
-              <span className="block leading-none text-transparent bg-clip-text bg-[length:200%_auto] bg-gradient-to-r from-green-600 via-emerald-200 to-green-600 animate-gradient-slow group-hover:tracking-tight transition-all duration-1000 drop-shadow-[0_0_40px_rgba(74,222,128,0.4)] group-hover:drop-shadow-[0_0_60px_rgba(74,222,128,0.8)] filter brightness-125">
-                Dairy Farm
-              </span>
-            </h1>
-            
-            <div className="mt-16 flex flex-col items-center opacity-0 group-hover:opacity-100 transition-all duration-1000 translate-y-4 group-hover:translate-y-0">
-              <span className="text-green-400/40 text-xs font-black tracking-[0.6em] uppercase">
-                Tap to enter the heritage
-              </span>
-              <div className="h-[1px] w-0 bg-gradient-to-r from-transparent via-green-400/40 to-transparent mt-5 group-hover:w-60 transition-all duration-1000" />
+          {/* Name & Explore */}
+          <div className="land-anim flex flex-col items-center">
+            <div 
+              onClick={handleExplore}
+              className="group cursor-pointer select-none relative mb-12"
+            >
+              <h1 className="text-6xl sm:text-8xl md:text-[11rem] font-black tracking-tighter transition-all duration-1000 flex flex-col items-center">
+                <span className="block leading-none -mb-6 text-[#fdfcf0]/50 group-hover:text-white group-hover:drop-shadow-[0_0_20px_rgba(255,255,255,0.3)] group-hover:-translate-y-4 transition-all duration-1000 ease-out italic font-serif mix-blend-overlay filter brightness-110">
+                  Mishra
+                </span>
+                <span className="block leading-none text-transparent bg-clip-text bg-[length:200%_auto] bg-gradient-to-r from-green-600 via-emerald-200 to-green-600 animate-gradient-slow group-hover:tracking-tight transition-all duration-1000 drop-shadow-[0_0_40px_rgba(74,222,128,0.4)] group-hover:drop-shadow-[0_0_60px_rgba(74,222,128,0.8)] filter brightness-125">
+                  Dairy Farm
+                </span>
+              </h1>
+              
+              <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 w-full flex flex-col items-center opacity-0 group-hover:opacity-100 transition-all duration-1000 translate-y-4 group-hover:translate-y-0">
+                <span className="text-green-400/60 text-xs font-black tracking-[0.6em] uppercase">
+                  Ancient Traditions • Modern Purity
+                </span>
+              </div>
             </div>
 
-            {/* Background decorative glow */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-green-500/5 blur-[100px] rounded-full -z-10 group-hover:bg-green-500/10 transition-colors duration-1000" />
+            {/* Clear Action Button */}
+            <button
+              onClick={handleExplore}
+              className="group relative px-12 py-5 bg-green-600 hover:bg-green-500 text-white rounded-full font-black text-xl tracking-tight shadow-[0_20px_50px_rgba(22,163,74,0.3)] hover:shadow-[0_25px_60px_rgba(22,163,74,0.6)] transition-all duration-500 transform hover:-translate-y-1 active:scale-95 flex items-center gap-4 overflow-hidden mt-4"
+            >
+              <span className="relative z-10 uppercase tracking-widest text-sm">Explore Products</span>
+              <div className="relative z-10 w-8 h-8 bg-white/20 rounded-full flex items-center justify-center transition-transform duration-500 group-hover:translate-x-1">
+                <svg viewBox="0 0 24 24" className="w-5 h-5 fill-none stroke-current stroke-[3px]" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M5 12h14M12 5l7 7-7 7" />
+                </svg>
+              </div>
+              {/* Shine effect */}
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+            </button>
           </div>
 
           <style>{`
