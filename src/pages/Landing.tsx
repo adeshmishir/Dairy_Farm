@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { updateVisitTimestamp } from '../lib/visit';
 
 const features = [
   {
@@ -42,7 +43,7 @@ export default function Landing() {
   }, []);
 
   const handleExplore = () => {
-    localStorage.setItem('hasVisited', 'true');
+    updateVisitTimestamp();
     navigate('/');
   };
 

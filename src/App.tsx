@@ -14,6 +14,8 @@ import { useEffect } from 'react';
 
 import { useAuth } from './lib/auth';
 
+import { isVisitExpired, updateVisitTimestamp } from './lib/visit';
+
 // Scroll to top on every route change
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -25,8 +27,16 @@ function ScrollToTop() {
 
 function AppContent() {
   const { user } = useAuth();
-  const hasVisited = localStorage.getItem('hasVisited') === 'true';
-  const showLanding = !user && !hasVisited;
+  const { pathname } = useLocation();
+  const showLanding = !user && isVisitExpired() && pathname !== '/landing';
+
+  useEffect(() => {
+    // Only update timestamp if we are NOT on the landing page
+    // and NOT redirected to landing
+    if (pathname !== '/landing' && !showLanding) {
+      updateVisitTimestamp();
+    }
+  }, [pathname, showLanding]);
 
   return (
     <Routes>
